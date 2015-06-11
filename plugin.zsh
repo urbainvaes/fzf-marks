@@ -7,9 +7,8 @@ if [[ ! -f $BOOKMARKS_FILE ]]; then
 fi
 
 function mark() {
-    echo $1 : $(pwd) >> $BOOKMARKS_FILE
-    sort $BOOKMARKS_FILE -o $BOOKMARKS_FILE
-    echo "Mark successfully added"
+    # echo $1 : $(pwd) >> $BOOKMARKS_FILE
+    echo $1 : $(pwd) | sed "s#${HOME}#~#" >> $BOOKMARKS_FILE
 }
 
 fzfcmd() {
@@ -17,18 +16,24 @@ fzfcmd() {
 }
 
 function jump() {
-   cd "${$(cat ${BOOKMARKS_FILE} | $(fzfcmd) --bind=ctrl-y:accept | awk '{print $3}'):-.}"
-   zle reset-prompt
+    jumpline=$(cat ${BOOKMARKS_FILE} | $(fzfcmd) --bind=ctrl-y:accept --tac)
+    if [[ -n ${jumpline} ]]; then
+        jumpdir=$(echo $jumpline | awk '{print $3}')
+        sed -i "\#${jumpline}#d" $BOOKMARKS_FILE
+        cd ${jumpdir} && echo ${jumpline} >> $BOOKMARKS_FILE
+    fi
+    zle reset-prompt
 }
 
 zle     -N    jump
 bindkey '^n'  jump
 
 function dmark()  {
-    marks_to_delete=$(cat $BOOKMARKS_FILE | $(fzfcmd) -m --bind=ctrl-y:accept)
+    marks_to_delete=$(cat $BOOKMARKS_FILE | $(fzfcmd) -m --bind=ctrl-y:accept,ctrl-t:toggle-up)
 
-    newmarks=$(comm -23 ${BOOKMARKS_FILE} <(echo ${marks_to_delete} | sort))
-    echo ${newmarks} > ${BOOKMARKS_FILE}
+    while read -r line; do
+        sed -i "\#${line}#d" $BOOKMARKS_FILE
+    done <<< "$marks_to_delete"
 
     echo "** The following marks were deleted **"
     echo ${marks_to_delete}
