@@ -14,19 +14,17 @@ fzfcmd() {
    [ ${FZF_TMUX:-1} -eq 1 ] && echo "fzf-tmux -d${FZF_TMUX_HEIGHT:-40%}" || echo "fzf"
 }
 
-function jump() {
-    jumpline=$(cat ${BOOKMARKS_FILE} | $(fzfcmd) --bind=ctrl-y:accept --tac)
+function fzf-marks-navigate() {
+    local jumpline=$(cat ${BOOKMARKS_FILE} | $(fzfcmd) --bind=ctrl-y:accept --tac)
     if [[ -n ${jumpline} ]]; then
-        jumpdir=$(echo $jumpline | awk '{print $3}')
+        local jumpdir=$(echo $jumpline | awk '{print $3}')
         sed -i "\#${jumpline}#d" $BOOKMARKS_FILE
         cd ${jumpdir} && echo ${jumpline} >> $BOOKMARKS_FILE
     fi
-    zle reset-prompt
 }
 
-
 function dmark()  {
-    marks_to_delete=$(cat $BOOKMARKS_FILE | $(fzfcmd) -m --bind=ctrl-y:accept,ctrl-t:toggle-up --tac)
+    local marks_to_delete=$(cat $BOOKMARKS_FILE | $(fzfcmd) -m --bind=ctrl-y:accept,ctrl-t:toggle-up --tac)
 
     while read -r line; do
         sed -i "\#${line}#d" $BOOKMARKS_FILE
@@ -36,5 +34,4 @@ function dmark()  {
     echo ${marks_to_delete}
 }
 
-zle     -N    jump
-bindkey '^n'  jump
+bind '"\C-g":"fzf-marks-navigate\n"'
