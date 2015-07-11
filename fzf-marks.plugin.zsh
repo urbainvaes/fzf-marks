@@ -37,7 +37,7 @@ function dmark()  {
     marks_to_delete=$(cat $BOOKMARKS_FILE | $(fzfcmd) -m --bind=ctrl-y:accept,ctrl-t:toggle-up --tac)
 
     while read -r line; do
-        sed -i "\#${line}#d" $BOOKMARKS_FILE
+        sed -i --follow-symlinks "\#${line}#d" $BOOKMARKS_FILE
     done <<< "$marks_to_delete"
 
     echo "** The following marks were deleted **"
