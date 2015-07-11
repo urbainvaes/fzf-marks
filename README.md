@@ -20,7 +20,7 @@ Most of the key mappings in the search window are the default fzf ones. The most
 In Zsh or Bash, the script creates three commands:
 
 - **mark** to create a new bookmark. For example, `mark work` creates a bookmark labeled work.
-- **jump** to jump to a given bookmark using fzf. By default, the script binds this function to **ctrl-n**.
+- **jump** to jump to a given bookmark using fzf. By default, the script binds this function to **ctrl-g**.
 - **dmark** to delete marks toggled for deletion. 
 
 ## Sources

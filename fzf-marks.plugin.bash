@@ -14,11 +14,11 @@ fzfcmd() {
    [ ${FZF_TMUX:-1} -eq 1 ] && echo "fzf-tmux -d${FZF_TMUX_HEIGHT:-40%}" || echo "fzf"
 }
 
-function fzf-marks-navigate() {
+function jump() {
     local jumpline=$(cat ${BOOKMARKS_FILE} | $(fzfcmd) --bind=ctrl-y:accept --tac)
     if [[ -n ${jumpline} ]]; then
         local jumpdir=$(echo $jumpline | awk '{print $3}')
-        sed -i "\#${jumpline}#d" $BOOKMARKS_FILE
+        sed --follow-symlinks -i "\#${jumpline}#d" $BOOKMARKS_FILE
         cd ${jumpdir} && echo ${jumpline} >> $BOOKMARKS_FILE
     fi
 }
@@ -34,4 +34,4 @@ function dmark()  {
     echo ${marks_to_delete}
 }
 
-bind '"\C-g":"fzf-marks-navigate\n"'
+bind '"\C-g":"jump\n"'
