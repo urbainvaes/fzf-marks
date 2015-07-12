@@ -19,18 +19,9 @@ function jump() {
     if [[ -n ${jumpline} ]]; then
         jumpdir=$(echo $jumpline | awk '{print $3}')
         sed -i --follow-symlinks "\#${jumpline}#d" $BOOKMARKS_FILE
-        echo ${jumpline} >> $BOOKMARKS_FILE
-
-        zle
-
-        if [[ -z ${LBUFFER} ]]; then
-            LBUFFER="cd ${jumpdir}"
-        else
-            cd ${jumpdir}
-        fi
+        cd ${jumpdir} && echo ${jumpline} >> $BOOKMARKS_FILE
     fi
-
-    zle && zle accept-line zle && zle reset-prompt
+    zle && zle reset-prompt
 }
 
 function dmark()  {
