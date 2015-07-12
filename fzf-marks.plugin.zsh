@@ -27,12 +27,14 @@ function jump() {
 function dmark()  {
     marks_to_delete=$(cat $BOOKMARKS_FILE | $(fzfcmd) -m --bind=ctrl-y:accept,ctrl-t:toggle-up --tac)
 
-    while read -r line; do
-        sed -i --follow-symlinks "\#${line}#d" $BOOKMARKS_FILE
-    done <<< "$marks_to_delete"
+    if [[ -n ${marks_to_delete} ]]; then
+        while read -r line; do
+            sed -i --follow-symlinks "\#${line}#d" $BOOKMARKS_FILE
+        done <<< "$marks_to_delete"
 
-    echo "** The following marks were deleted **"
-    echo ${marks_to_delete}
+        echo "** The following marks were deleted **"
+        echo ${marks_to_delete}
+    fi
 }
 
 zle -N jump
