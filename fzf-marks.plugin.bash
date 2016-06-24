@@ -17,7 +17,7 @@ fzfcmd() {
 function jump() {
     local jumpline=$(cat ${BOOKMARKS_FILE} | $(fzfcmd) --bind=ctrl-y:accept --tac)
     if [[ -n ${jumpline} ]]; then
-        local jumpdir=$(echo $jumpline | awk '{print $3}')
+        local jumpdir=$(echo $jumpline | awk '{print $3}' | sed "s#~#$HOME#")
         sed --follow-symlinks -i "\#${jumpline}#d" $BOOKMARKS_FILE
         cd ${jumpdir} && echo ${jumpline} >> $BOOKMARKS_FILE
     fi
