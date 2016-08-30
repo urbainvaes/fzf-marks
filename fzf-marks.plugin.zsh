@@ -15,6 +15,8 @@ fzfcmd() {
 }
 
 function jump() {
+    local jumpline jumpdir
+
     jumpline=$(cat ${BOOKMARKS_FILE} | $(fzfcmd) --bind=ctrl-y:accept --tac)
     if [[ -n ${jumpline} ]]; then
         jumpdir=$(echo $jumpline | awk '{print $3}' | sed "s#~#$HOME#")
@@ -25,6 +27,8 @@ function jump() {
 }
 
 function dmark()  {
+    local marks_to_delete line
+
     marks_to_delete=$(cat $BOOKMARKS_FILE | $(fzfcmd) -m --bind=ctrl-y:accept,ctrl-t:toggle-up --tac)
 
     if [[ -n ${marks_to_delete} ]]; then
