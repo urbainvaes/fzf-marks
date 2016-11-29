@@ -7,7 +7,7 @@ if [[ ! -f $BOOKMARKS_FILE ]]; then
 fi
 
 function mark() {
-    echo $1 : $(pwd) >> $BOOKMARKS_FILE
+    echo $@ : $(pwd) >> $BOOKMARKS_FILE
 }
 
 fzfcmd() {
@@ -34,7 +34,7 @@ function dmark()  {
         done <<< "$marks_to_delete"
 
         echo "** The following marks were deleted **"
-        echo ${marks_to_delete}
+        echo "${marks_to_delete}"
     fi
 }
 
