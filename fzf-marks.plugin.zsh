@@ -15,25 +15,22 @@ fzfcmd() {
 }
 
 function jump() {
-    local jumpline jumpdir
-
-    jumpline=$(cat ${BOOKMARKS_FILE} | $(fzfcmd) --bind=ctrl-y:accept --tac)
+    local jumpline=$(cat ${BOOKMARKS_FILE} | $(fzfcmd) --bind=ctrl-y:accept --tac)
     if [[ -n ${jumpline} ]]; then
-        jumpdir=$(echo "${jumpline}" | awk '{$1=$2="";print}' | xargs | sed "s#~#$HOME#")
-        sed -i --follow-symlinks "\#${jumpline}#d" $BOOKMARKS_FILE
-        cd ${jumpdir} && echo ${jumpline} >> $BOOKMARKS_FILE
+        local jumpdir=$(echo "${jumpline}" | awk '{$1=$2="";print}' | xargs | sed "s#~#$HOME#")
+        perl -p -i -e "s#${jumpline}\n##g" $BOOKMARKS_FILE
+        cd "${jumpdir}" && echo ${jumpline} >> $BOOKMARKS_FILE
     fi
     zle && zle reset-prompt
 }
 
 function dmark()  {
     local marks_to_delete line
-
     marks_to_delete=$(cat $BOOKMARKS_FILE | $(fzfcmd) -m --bind=ctrl-y:accept,ctrl-t:toggle-up --tac)
 
     if [[ -n ${marks_to_delete} ]]; then
         while read -r line; do
-            sed -i --follow-symlinks "\#${line}#d" $BOOKMARKS_FILE
+            perl -p -i -e "s#${line}\n##g" $BOOKMARKS_FILE
         done <<< "$marks_to_delete"
 
         echo "** The following marks were deleted **"
