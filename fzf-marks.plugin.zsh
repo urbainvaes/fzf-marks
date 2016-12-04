@@ -15,9 +15,11 @@ fzfcmd() {
 }
 
 function jump() {
-    local jumpline=$(cat ${BOOKMARKS_FILE} | $(fzfcmd) --bind=ctrl-y:accept --tac)
+    local jumpline
+    jumpline=$(cat ${BOOKMARKS_FILE} | $(fzfcmd) --bind=ctrl-y:accept --tac)
     if [[ -n ${jumpline} ]]; then
-        local jumpdir=$(echo "${jumpline}" | sed -n "s/.* : \(.*\)$/\1/p" | sed "s#~#$HOME#")
+        local jumpdir
+        jumpdir=$(echo "${jumpline}" | sed -n "s/.* : \(.*\)$/\1/p" | sed "s#~#$HOME#")
         perl -p -i -e "s#${jumpline}\n##g" $BOOKMARKS_FILE
         cd "${jumpdir}" && echo ${jumpline} >> $BOOKMARKS_FILE
     fi
