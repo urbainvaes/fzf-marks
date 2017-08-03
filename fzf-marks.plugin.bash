@@ -7,7 +7,7 @@ if [[ ! -f $BOOKMARKS_FILE ]]; then
 fi
 
 function mark() {
-    echo $@ : $(pwd) >> $BOOKMARKS_FILE
+    echo "$@ : $(pwd)" >> $BOOKMARKS_FILE
 }
 
 fzfcmd() {
