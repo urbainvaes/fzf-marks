@@ -1,0 +1,16 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+dmark	fzf-marks.plugin.bash	/^function dmark()  {$/;"	f
+dmark	fzf-marks.plugin.zsh	/^function dmark()  {$/;"	f
+fzfcmd	fzf-marks.plugin.bash	/^fzfcmd() {$/;"	f
+fzfcmd	fzf-marks.plugin.zsh	/^fzfcmd() {$/;"	f
+handle_symlinks	fzf-marks.plugin.bash	/^function handle_symlinks() {$/;"	f
+handle_symlinks	fzf-marks.plugin.zsh	/^function handle_symlinks() {$/;"	f
+jump	fzf-marks.plugin.bash	/^function jump() {$/;"	f
+jump	fzf-marks.plugin.zsh	/^function jump() {$/;"	f
+mark	fzf-marks.plugin.bash	/^function mark() {$/;"	f
+mark	fzf-marks.plugin.zsh	/^function mark() {$/;"	f
