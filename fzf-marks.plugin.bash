@@ -1,17 +1,22 @@
-if [[ -z $BOOKMARKS_FILE ]] ; then
-    export BOOKMARKS_FILE="$HOME/.bookmarks"
+if [[ -z ${BOOKMARKS_FILE} ]] ; then
+    export BOOKMARKS_FILE="${HOME}/.bookmarks"
 fi
 
-if [[ ! -f $BOOKMARKS_FILE ]]; then
-    touch $BOOKMARKS_FILE
+if [[ ! -f ${BOOKMARKS_FILE} ]]; then
+    touch "${BOOKMARKS_FILE}"
 fi
 
 function mark() {
-    echo "$@ : $(pwd)" >> $BOOKMARKS_FILE
+    local mark_to_add
+    mark_to_add=$(echo "$* : $(pwd)")
+    echo "${mark_to_add}" >> "${BOOKMARKS_FILE}"
+
+    echo "** The following mark has been added **"
+    echo "${mark_to_add}"
 }
 
 fzfcmd() {
-   [ ${FZF_TMUX:-1} -eq 1 ] && echo "fzf-tmux -d${FZF_TMUX_HEIGHT:-40%}" || echo "fzf"
+   [ "${FZF_TMUX:-1}" -eq 1 ] && echo "fzf-tmux -d${FZF_TMUX_HEIGHT:-40%}" || echo "fzf"
 }
 
 function handle_symlinks() {
@@ -26,18 +31,18 @@ function handle_symlinks() {
 
 function jump() {
     local jumpline jumpdir bookmarks
-    jumpline=$(cat ${BOOKMARKS_FILE} | $(fzfcmd) --bind=ctrl-y:accept --tac)
+    jumpline=$($(fzfcmd) --bind=ctrl-y:accept --tac < "${BOOKMARKS_FILE}")
     if [[ -n ${jumpline} ]]; then
-        jumpdir=$(echo "${jumpline}" | sed -n "s/.* : \(.*\)$/\1/p" | sed "s#~#$HOME#")
+        jumpdir=$(echo "${jumpline}" | sed -n "s/.* : \(.*\)$/\1/p" | sed "s#~#${HOME}#")
         bookmarks=$(handle_symlinks)
         perl -p -i -e "s#${jumpline}\n##g" "${bookmarks}"
-        cd "${jumpdir}" && echo ${jumpline} >> $BOOKMARKS_FILE
+        cd "${jumpdir}" && echo "${jumpline}" >> "${BOOKMARKS_FILE}"
     fi
 }
 
 function dmark()  {
     local marks_to_delete line bookmarks
-    marks_to_delete=$(cat $BOOKMARKS_FILE | $(fzfcmd) -m --bind=ctrl-y:accept,ctrl-t:toggle-up --tac)
+    marks_to_delete=$($(fzfcmd) -m --bind=ctrl-y:accept,ctrl-t:toggle-up --tac < "${BOOKMARKS_FILE}")
     bookmarks=$(handle_symlinks)
 
     if [[ -n ${marks_to_delete} ]]; then
