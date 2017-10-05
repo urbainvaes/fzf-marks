@@ -7,9 +7,18 @@ if [[ ! -f "${BOOKMARKS_FILE}" ]]; then
 fi
 
 if [[ -z "${FZF_MARKS_COMMAND}" ]] ; then
-   # [ ${FZF_TMUX:-1} -eq 1 ] && echo "fzf-tmux -d${FZF_TMUX_HEIGHT:-40%}" || echo "fzf"
-    export FZF_MARKS_COMMAND='fzf --height 40% --reverse'
+
+    FZF_VERSION=$( fzf --version | perl -pe '($_)=/([0-9]+.[0-9]+.[0-9]+)/' )
+    FZF_VERSION_NUMBER=${v//.}
+    MINIMUM_VERSION=160
+
+    if [ $FZF_VERSION_NUMBER -lt $MINIMUM_VERSION ]; then
+        export FZF_MARKS_COMMAND='fzf'
+    else
+        export FZF_MARKS_COMMAND='fzf --height 40% --reverse'
+    fi
 fi
+
 
 function mark() {
     local mark_to_add
