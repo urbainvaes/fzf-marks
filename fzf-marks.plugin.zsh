@@ -6,6 +6,11 @@ if [[ ! -f "${BOOKMARKS_FILE}" ]]; then
     touch "${BOOKMARKS_FILE}"
 fi
 
+if [[ -z "${FZF_MARKS_COMMAND}" ]] ; then
+   # [ ${FZF_TMUX:-1} -eq 1 ] && echo "fzf-tmux -d${FZF_TMUX_HEIGHT:-40%}" || echo "fzf"
+    export FZF_MARKS_COMMAND='fzf --height 40% --reverse'
+fi
+
 function mark() {
     local mark_to_add
     mark_to_add=$(echo "$* : $(pwd)")
@@ -16,7 +21,7 @@ function mark() {
 }
 
 fzfcmd() {
-   [ ${FZF_TMUX:-1} -eq 1 ] && echo "fzf-tmux -d${FZF_TMUX_HEIGHT:-40%}" || echo "fzf"
+   echo $FZF_MARKS_COMMAND
 }
 
 function handle_symlinks() {
