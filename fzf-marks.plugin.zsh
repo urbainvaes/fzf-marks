@@ -63,7 +63,7 @@ function dmark()  {
             perl -p -i -e "s#${line}\n##g" ${bookmarks}
         done <<< "$marks_to_delete"
 
-        echo "** The following marks were deleted **"
+        echo "** The following marks have been deleted **"
         echo "${marks_to_delete}"
     fi
 }
