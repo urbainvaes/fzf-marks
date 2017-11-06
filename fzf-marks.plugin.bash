@@ -43,7 +43,7 @@ function handle_symlinks() {
 
 function jump() {
     local jumpline jumpdir bookmarks
-    jumpline=$($(echo ${FZF_MARKS_COMMAND}) --bind=ctrl-y:accept --tac < "${BOOKMARKS_FILE}")
+    jumpline=$($(echo ${FZF_MARKS_COMMAND}) --bind=ctrl-y:accept --query="$*" --select-1 --tac < "${BOOKMARKS_FILE}")
     if [[ -n ${jumpline} ]]; then
         jumpdir=$(echo "${jumpline}" | sed -n "s/.* : \(.*\)$/\1/p" | sed "s#~#${HOME}#")
         bookmarks=$(handle_symlinks)
@@ -54,7 +54,7 @@ function jump() {
 
 function dmark()  {
     local marks_to_delete line bookmarks
-    marks_to_delete=$($(echo ${FZF_MARKS_COMMAND}) -m --bind=ctrl-y:accept,ctrl-t:toggle --tac < "${BOOKMARKS_FILE}")
+    marks_to_delete=$($(echo ${FZF_MARKS_COMMAND}) -m --bind=ctrl-y:accept,ctrl-t:toggle --query="$*" --tac < "${BOOKMARKS_FILE}")
     bookmarks=$(handle_symlinks)
 
     if [[ -n ${marks_to_delete} ]]; then
