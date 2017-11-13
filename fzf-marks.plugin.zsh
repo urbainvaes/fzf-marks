@@ -41,6 +41,16 @@ function handle_symlinks() {
     echo "${fname}"
 }
 
+# Ensure precmds are run after cd
+function redraw-prompt() {
+    local precmd
+    for precmd in $precmd_functions; do
+        $precmd
+    done
+    zle reset-prompt
+}
+zle -N redraw-prompt
+
 function jump() {
     local jumpline jumpdir bookmarks
     jumpline=$($(echo ${FZF_MARKS_COMMAND}) --bind=ctrl-y:accept --query="$*" --select-1 --tac < "${BOOKMARKS_FILE}")
@@ -50,7 +60,7 @@ function jump() {
         perl -p -i -e "s#${jumpline}\n##g" "${bookmarks}"
         cd "${jumpdir}" && echo "${jumpline}" >> "${BOOKMARKS_FILE}"
     fi
-    zle && zle reset-prompt
+    zle && zle redraw-prompt
 }
 
 function dmark()  {
