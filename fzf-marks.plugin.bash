@@ -67,4 +67,7 @@ function dmark()  {
     fi
 }
 
-bind '"\C-g":"jump\n"'
+bind "\"${FZF_MARKS_JUMP:-\C-g}\":\"jump\n\""
+if [ "${FZF_MARKS_DMARK}" ]; then
+    bind "\"${FZF_MARKS_DMARK}\":\"dmark\n\""
+fi

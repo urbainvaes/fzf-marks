@@ -76,7 +76,12 @@ function dmark()  {
         echo "** The following marks have been deleted **"
         echo "${marks_to_delete}"
     fi
+    zle && zle reset-prompt
 }
 
 zle -N jump
-bindkey '^g' jump
+bindkey ${FZF_MARKS_JUMP:-'^g'} jump
+if [ "${FZF_MARKS_DMARK}" ]; then
+    zle -N dmark
+    bindkey ${FZF_MARKS_DMARK} dmark
+fi
