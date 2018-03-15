@@ -25,9 +25,13 @@ fi
 function mark() {
     local mark_to_add
     mark_to_add=$(echo "$* : $(pwd)")
-    echo "${mark_to_add}" >> "${BOOKMARKS_FILE}"
 
-    echo "** The following mark has been added **"
+    if grep -qxFe "${mark_to_add}" "${BOOKMARKS_FILE}"; then
+        echo "** The following mark already exists **"
+    else
+        echo "${mark_to_add}" >> "${BOOKMARKS_FILE}"
+        echo "** The following mark has been added **"
+    fi
     echo "${mark_to_add}"
 }
 
