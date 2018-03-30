@@ -24,7 +24,7 @@ fi
 
 function mark() {
     local mark_to_add
-    mark_to_add=$(echo "$* : $(pwd)")
+    mark_to_add="$* : $(pwd)"
 
     if grep -qxFe "${mark_to_add}" "${BOOKMARKS_FILE}"; then
         echo "** The following mark already exists **"
@@ -71,7 +71,7 @@ function dmark()  {
     fi
 }
 
-bind "\"${FZF_MARKS_JUMP:-\C-g}\":\"jump\n\""
+bind "\"${FZF_MARKS_JUMP:-\C-g}\":\"jump\\n\""
 if [ "${FZF_MARKS_DMARK}" ]; then
-    bind "\"${FZF_MARKS_DMARK}\":\"dmark\n\""
+    bind "\"${FZF_MARKS_DMARK}\":\"dmark\\n\""
 fi
