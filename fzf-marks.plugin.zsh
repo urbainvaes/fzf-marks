@@ -59,9 +59,9 @@ function jump() {
     local jumpline jumpdir bookmarks
     jumpline=$($(echo ${FZF_MARKS_COMMAND}) --bind=ctrl-y:accept --query="$*" --select-1 --tac < "${BOOKMARKS_FILE}")
     if [[ -n ${jumpline} ]]; then
-        jumpdir=$(echo "${jumpline}" | sed -n "s/.* : \(.*\)$/\1/p" | sed "s#~#${HOME}#")
+        jumpdir=$(echo "${jumpline}" | sed -n 's/.* : \(.*\)$/\1/p' | sed "s#~#${HOME}#")
         bookmarks=$(handle_symlinks)
-        perl -p -i -e "s#${jumpline}\n##g" "${bookmarks}"
+        perl -n -i -e "print unless /^${jumpline//\//\\/}\$/" "${bookmarks}"
         cd "${jumpdir}" && echo "${jumpline}" >> "${BOOKMARKS_FILE}"
     fi
     zle && zle redraw-prompt
@@ -73,8 +73,8 @@ function dmark()  {
     bookmarks=$(handle_symlinks)
 
     if [[ -n ${marks_to_delete} ]]; then
-        while read -r line; do
-            perl -p -i -e "s#${line}\n##g" ${bookmarks}
+        while IFS='' read -r line; do
+            perl -n -i -e "print unless /^${line//\//\\/}\$/" "${bookmarks}"
         done <<< "$marks_to_delete"
 
         echo "** The following marks have been deleted **"
