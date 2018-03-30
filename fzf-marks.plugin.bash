@@ -1,9 +1,9 @@
-if [[ -z "${BOOKMARKS_FILE}" ]] ; then
-    export BOOKMARKS_FILE="${HOME}/.bookmarks"
+if [[ -z "${FZF_MARKS_FILE}" ]] ; then
+    export FZF_MARKS_FILE="${HOME}/.fzf-marks"
 fi
 
-if [[ ! -f "${BOOKMARKS_FILE}" ]]; then
-    touch "${BOOKMARKS_FILE}"
+if [[ ! -f "${FZF_MARKS_FILE}" ]]; then
+    touch "${FZF_MARKS_FILE}"
 fi
 
 if [[ -z "${FZF_MARKS_COMMAND}" ]] ; then
@@ -26,10 +26,10 @@ function mark() {
     local mark_to_add
     mark_to_add="$* : $(pwd)"
 
-    if grep -qxFe "${mark_to_add}" "${BOOKMARKS_FILE}"; then
+    if grep -qxFe "${mark_to_add}" "${FZF_MARKS_FILE}"; then
         echo "** The following mark already exists **"
     else
-        echo "${mark_to_add}" >> "${BOOKMARKS_FILE}"
+        echo "${mark_to_add}" >> "${FZF_MARKS_FILE}"
         echo "** The following mark has been added **"
     fi
     echo "${mark_to_add}"
@@ -37,28 +37,28 @@ function mark() {
 
 function handle_symlinks() {
     local fname
-    if [ -L "${BOOKMARKS_FILE}" ]; then
-        fname=$(readlink "${BOOKMARKS_FILE}")
+    if [ -L "${FZF_MARKS_FILE}" ]; then
+        fname=$(readlink "${FZF_MARKS_FILE}")
     else
-        fname=${BOOKMARKS_FILE}
+        fname=${FZF_MARKS_FILE}
     fi
     echo "${fname}"
 }
 
 function jump() {
     local jumpline jumpdir bookmarks
-    jumpline=$($(echo ${FZF_MARKS_COMMAND}) --bind=ctrl-y:accept --query="$*" --select-1 --tac < "${BOOKMARKS_FILE}")
+    jumpline=$($(echo ${FZF_MARKS_COMMAND}) --bind=ctrl-y:accept --query="$*" --select-1 --tac < "${FZF_MARKS_FILE}")
     if [[ -n ${jumpline} ]]; then
         jumpdir=$(echo "${jumpline}" | sed -n 's/.* : \(.*\)$/\1/p' | sed "s#~#${HOME}#")
         bookmarks=$(handle_symlinks)
         perl -n -i -e "print unless /^${jumpline//\//\\/}\$/" "${bookmarks}"
-        cd "${jumpdir}" && echo "${jumpline}" >> "${BOOKMARKS_FILE}"
+        cd "${jumpdir}" && echo "${jumpline}" >> "${FZF_MARKS_FILE}"
     fi
 }
 
 function dmark()  {
     local marks_to_delete line bookmarks
-    marks_to_delete=$($(echo ${FZF_MARKS_COMMAND}) -m --bind=ctrl-y:accept,ctrl-t:toggle --query="$*" --tac < "${BOOKMARKS_FILE}")
+    marks_to_delete=$($(echo ${FZF_MARKS_COMMAND}) -m --bind=ctrl-y:accept,ctrl-t:toggle --query="$*" --tac < "${FZF_MARKS_FILE}")
     bookmarks=$(handle_symlinks)
 
     if [[ -n ${marks_to_delete} ]]; then
