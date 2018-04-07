@@ -1,3 +1,25 @@
+# MIT License
+
+# Copyright (c) 2018 Urbain Vaes
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
 if [[ -z "${FZF_MARKS_FILE}" ]] ; then
     export FZF_MARKS_FILE="${HOME}/.fzf-marks"
 fi
@@ -22,7 +44,7 @@ if [[ -z "${FZF_MARKS_COMMAND}" ]] ; then
     export FZF_MARKS_COMMAND
 fi
 
-function mark() {
+function mark {
     local mark_to_add
     mark_to_add="$* : $(pwd)"
 
@@ -35,7 +57,7 @@ function mark() {
     echo "${mark_to_add}"
 }
 
-function handle_symlinks() {
+function handle_symlinks {
     local fname
     if [ -L "${FZF_MARKS_FILE}" ]; then
         fname=$(readlink "${FZF_MARKS_FILE}")
@@ -55,7 +77,7 @@ function redraw-prompt() {
 }
 zle -N redraw-prompt
 
-function jump() {
+function jump {
     local jumpline jumpdir bookmarks
     jumpline=$($(echo ${FZF_MARKS_COMMAND}) --bind=ctrl-y:accept --query="$*" --select-1 --tac < "${FZF_MARKS_FILE}")
     if [[ -n ${jumpline} ]]; then
@@ -67,7 +89,7 @@ function jump() {
     zle && zle redraw-prompt
 }
 
-function dmark()  {
+function dmark {
     local marks_to_delete line bookmarks
     marks_to_delete=$($(echo ${FZF_MARKS_COMMAND}) -m --bind=ctrl-y:accept,ctrl-t:toggle --query="$*" --tac < "${FZF_MARKS_FILE}")
     bookmarks=$(handle_symlinks)
