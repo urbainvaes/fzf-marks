@@ -106,8 +106,9 @@ function dmark {
 }
 
 zle -N jump
+zle -N dmark
+
 bindkey ${FZF_MARKS_JUMP:-'^g'} jump
 if [ "${FZF_MARKS_DMARK}" ]; then
-    zle -N dmark
     bindkey ${FZF_MARKS_DMARK} dmark
 fi
