@@ -99,10 +99,10 @@ function mark {
         echo "${mark_to_add}" >> "${FZF_MARKS_FILE}"
         echo "** The following mark has been added **"
     fi
-    echo "${mark_to_add}"
+    echo "${mark_to_add}" | _color_marks
 }
 
-function handle_symlinks {
+function _handle_symlinks {
     local fname
     if [ -L "${FZF_MARKS_FILE}" ]; then
         fname=$(readlink "${FZF_MARKS_FILE}")
@@ -112,12 +112,25 @@ function handle_symlinks {
     echo "${fname}"
 }
 
+function _color_marks {
+    if [[ "${FZF_MARKS_NO_COLORS}" == "1" ]]; then
+        cat
+    else
+        local esc c_lhs c_rhs c_colon
+        esc=$(printf '\033')
+        c_lhs=${FZF_MARKS_COLOR_LHS:-39}
+        c_rhs=${FZF_MARKS_COLOR_RHS:-36}
+        c_colon=${FZF_MARKS_COLOR_COLON:-33}
+        sed "s/^\(.*\) : \(.*\)$/${esc}[${c_lhs}m\1${esc}[0m ${esc}[${c_colon}m:${esc}[0m ${esc}[${c_rhs}m\2${esc}[0m/"
+    fi
+}
+
 function jump {
     local jumpline jumpdir bookmarks
-    jumpline=$($(echo ${FZF_MARKS_COMMAND}) --bind=ctrl-y:accept --query="$*" --select-1 --tac < "${FZF_MARKS_FILE}")
+    jumpline=$(_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} --ansi --bind=ctrl-y:accept --query="$*" --select-1 --tac)
     if [[ -n ${jumpline} ]]; then
         jumpdir=$(echo "${jumpline}" | sed -n 's/.* : \(.*\)$/\1/p' | sed "s#~#${HOME}#")
-        bookmarks=$(handle_symlinks)
+        bookmarks=$(_handle_symlinks)
         perl -n -i -e "print unless /^${jumpline//\//\\/}\$/" "${bookmarks}"
         cd "${jumpdir}" && echo "${jumpline}" >> "${FZF_MARKS_FILE}"
     fi
@@ -125,8 +138,8 @@ function jump {
 
 function dmark {
     local marks_to_delete line bookmarks
-    marks_to_delete=$($(echo ${FZF_MARKS_COMMAND}) -m --bind=ctrl-y:accept,ctrl-t:toggle --query="$*" --tac < "${FZF_MARKS_FILE}")
-    bookmarks=$(handle_symlinks)
+    marks_to_delete=$(_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} -m --ansi --bind=ctrl-y:accept,ctrl-t:toggle --query="$*" --tac)
+    bookmarks=$(_handle_symlinks)
 
     if [[ -n ${marks_to_delete} ]]; then
         while IFS='' read -r line; do
@@ -134,7 +147,7 @@ function dmark {
         done <<< "$marks_to_delete"
 
         echo "** The following marks have been deleted **"
-        echo "${marks_to_delete}"
+        echo "${marks_to_delete}" | _color_marks
     fi
 }
 
