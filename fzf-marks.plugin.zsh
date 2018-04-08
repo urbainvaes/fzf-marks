@@ -44,6 +44,51 @@ if [[ -z "${FZF_MARKS_COMMAND}" ]] ; then
     export FZF_MARKS_COMMAND
 fi
 
+function fzm
+{
+  if [ -z "$1" ]; then
+    _fzm_usage
+    return
+  fi
+
+  subcommand="$1"
+  shift
+
+  case "$subcommand" in
+    -n|--new)
+      mark "$@"
+      ;;
+    -d|--delete)
+      dmark "$@"
+      ;;
+    -j|--jump)
+      jump "$@"
+      ;;
+    -h|--help)
+      _fzm_usage
+      ;;
+    *)
+      jump "$subcommand"
+      ;;
+  esac
+  return $?
+}
+
+function _fzm_usage
+{
+  cat <<"EOB"
+OPTIONS:
+  -n, --new: add a mark to the current directory
+    fzm -n|--new <mark>
+  -d, --delete: delete a mark
+    fzm -d|--delete [<mark>]
+  -j, --jump: jump to a mark
+    fzm -j|--jump [<mark>]
+  -h, --help: print this help
+    fzm -h|--help
+EOB
+}
+
 function mark {
     local mark_to_add
     mark_to_add="$* : $(pwd)"

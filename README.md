@@ -39,18 +39,24 @@ The only additions are
 
 The script creates three commands:
 
-- **mark**, to create a new mark;
-- **jump**, to jump to a mark;
-- **dmark**, to delete the marks toggled for deletion.
+- **mark** (or **fzm -n**), to create a new mark;
+- **jump** (or **fzm -j**), to jump to a mark;
+- **dmark** (or **fzm -d**), to toggle marks for deletion.
 
 # Customization
 
-| Config              | Default                      | Description                    |
-| ------              | -------                      | -----------                    |
-| `FZF_MARKS_FILE`    | `${HOME}/.fzf-marks`         | File containing the marks data |
-| `FZF_MARKS_COMMAND` | `fzf --height 40% --reverse` | Command used to call `fzf`     |
-| `FZF_MARKS_JUMP`    | `\C-g` (*bash*) or `^g` (*zsh*)  | Keybinding to `jump`           |
-| `FZF_MARKS_DMARK`   | None                         | Keybinding to `dmark`          |
+| Config                | Default                         | Description                        |
+| ------                | -------                         | -----------                        |
+| `FZF_MARKS_FILE`      | `${HOME}/.fzf-marks`            | File containing the marks data     |
+| `FZF_MARKS_COMMAND`   | `fzf --height 40% --reverse`    | Command used to call `fzf`         |
+| `FZF_MARKS_JUMP`      | `\C-g` (*bash*) or `^g` (*zsh*)     | Keybinding to `jump`               |
+| `FZF_MARKS_DMARK`     | None                            | Keybinding to `dmark`              |
+| `FZF_MARKS_COLOR_LHS` | 39 (default)                    | ANSI color code of left-hand side  |
+| `FZF_MARKS_COLOR_RHS` | 36 (cyan)                       | ANSI color code of right-hand side |
+| `FZF_MARKS_COLOR_SEP` | 33 (yellow)                     | ANSI color code of separator       |
+| `FZF_MARKS_NO_COLORS` | 0                               | Set this to 1 to disable colors    |
+
+See e.g. [here](http://pueblo.sourceforge.net/doc/manual/ansi_color_codes.html) for a description of ANSI color codes.
 
 # License
 
