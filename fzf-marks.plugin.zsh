@@ -90,9 +90,36 @@ function _color_marks {
     fi
 }
 
+function fzm {
+    lines=$(_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} \
+        --ansi \
+        --expect=${FZF_MARKS_DELETE:-ctrl-d} \
+        --multi \
+        --bind=ctrl-y:accept,ctrl-t:toggle \
+        --query="$*" \
+        --select-1 \
+        --tac)
+    if [[ -z "$lines" ]]; then
+        zle && zle redraw-prompt
+        return 1
+    fi
+
+    key=$(head -1 <<< "$lines")
+
+    if [[ $key == "${FZF_MARKS_DELETE:-ctrl-d}" ]]; then
+        dmark "-->-->-->" "$(sed 1d <<< "$lines")"
+    else
+        jump "-->-->-->" "$(tail -1 <<< "${lines}")"
+    fi
+}
+
 function jump {
     local jumpline jumpdir bookmarks
-    jumpline=$(_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} --ansi --bind=ctrl-y:accept --query="$*" --select-1 --tac)
+    if [[ $1 == "-->-->-->" ]]; then
+        jumpline=$2
+    else
+        jumpline=$(_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} --ansi --bind=ctrl-y:accept --query="$*" --select-1 --tac)
+    fi
     if [[ -n ${jumpline} ]]; then
         jumpdir=$(echo "${jumpline}" | sed -n 's/.* : \(.*\)$/\1/p' | sed "s#~#${HOME}#")
         bookmarks=$(_handle_symlinks)
@@ -104,7 +131,11 @@ function jump {
 
 function dmark {
     local marks_to_delete line bookmarks
-    marks_to_delete=$(_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} -m --ansi --bind=ctrl-y:accept,ctrl-t:toggle --query="$*" --tac)
+    if [[ $1 == "-->-->-->" ]]; then
+        marks_to_delete=$2
+    else
+        marks_to_delete=$(_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} -m --ansi --bind=ctrl-y:accept,ctrl-t:toggle --query="$*" --tac)
+    fi
     bookmarks=$(_handle_symlinks)
 
     if [[ -n ${marks_to_delete} ]]; then
@@ -120,8 +151,9 @@ function dmark {
 
 zle -N jump
 zle -N dmark
+zle -N fzm
 
-bindkey ${FZF_MARKS_JUMP:-'^g'} jump
+bindkey ${FZF_MARKS_JUMP:-'^g'} fzm
 if [ "${FZF_MARKS_DMARK}" ]; then
     bindkey ${FZF_MARKS_DMARK} dmark
 fi

@@ -31,17 +31,19 @@ source fzf-marks/fzf-marks.plugin.bash
 ```
 
 # Usage
+The script exposes two functions:
+
+- **mark \<mark\>**, to register a new mark to the current directory;
+- **fzm [\<optional-initial-query\>]**, to jump to or delete a mark using `fzf`.
+
 Most of the keybindings in the search window are the default fzf ones.
 The only additions are
 
-- **ctrl-y**, to accept a match;
-- **ctrl-t**, to toggle a match for deletion.
+- **ctrl-y**, to jump to a match;
+- **ctrl-t**, to toggle a match for deletion;
+- **ctrl-d**, to delete selected matches.
 
-The script creates three commands:
-
-- **mark** (or **fzm -n**), to create a new mark;
-- **jump** (or **fzm -j**), to jump to a mark;
-- **dmark** (or **fzm -d**), to toggle marks for deletion.
+By default, the plugin binds the key `ctrl-g` to `fzm`.
 
 # Customization
 
@@ -49,8 +51,7 @@ The script creates three commands:
 | ------                | -------                         | -----------                        |
 | `FZF_MARKS_FILE`      | `${HOME}/.fzf-marks`            | File containing the marks data     |
 | `FZF_MARKS_COMMAND`   | `fzf --height 40% --reverse`    | Command used to call `fzf`         |
-| `FZF_MARKS_JUMP`      | `\C-g` (*bash*) or `^g` (*zsh*)     | Keybinding to `jump`               |
-| `FZF_MARKS_DMARK`     | None                            | Keybinding to `dmark`              |
+| `FZF_MARKS_JUMP`      | `\C-g` (*bash*) or `^g` (*zsh*)     | Keybinding to `fzm`                |
 | `FZF_MARKS_COLOR_LHS` | 39 (default)                    | ANSI color code of left-hand side  |
 | `FZF_MARKS_COLOR_RHS` | 36 (cyan)                       | ANSI color code of right-hand side |
 | `FZF_MARKS_COLOR_SEP` | 33 (yellow)                     | ANSI color code of separator       |
