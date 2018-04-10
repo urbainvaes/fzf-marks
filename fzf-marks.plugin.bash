@@ -131,7 +131,9 @@ function dmark {
             perl -n -i -e "print unless /^${line//\//\\/}\$/" "${bookmarks}"
         done <<< "$marks_to_delete"
 
-        echo "** The following marks have been deleted **"
+        [[ $(wc -l <<< "${marks_to_delete}") == 1 ]] \
+            && echo "** The following mark has been deleted **" \
+            || echo "** The following marks have been deleted **"
         echo "${marks_to_delete}" | _color_marks
     fi
 }
