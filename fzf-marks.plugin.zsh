@@ -20,6 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+command -v fzf >/dev/null 2>&1 || return
+
 if [[ -z "${FZF_MARKS_FILE}" ]] ; then
     export FZF_MARKS_FILE="${HOME}/.fzf-marks"
 fi
