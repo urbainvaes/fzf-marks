@@ -114,7 +114,7 @@ function jump {
     if [[ -n ${jumpline} ]]; then
         jumpdir=$(echo "${jumpline}" | sed -n 's/.* : \(.*\)$/\1/p' | sed "s#~#${HOME}#")
         bookmarks=$(_handle_symlinks)
-        perl -n -i -e "print unless /^${jumpline//\//\\/}\$/" "${bookmarks}"
+        perl -n -i -e "print unless /^\\Q${jumpline//\//\\/}\\E\$/" "${bookmarks}"
         cd "${jumpdir}" && echo "${jumpline}" >> "${FZF_MARKS_FILE}"
     fi
 }
@@ -130,7 +130,7 @@ function dmark {
 
     if [[ -n ${marks_to_delete} ]]; then
         while IFS='' read -r line; do
-            perl -n -i -e "print unless /^${line//\//\\/}\$/" "${bookmarks}"
+            perl -n -i -e "print unless /^\\Q${line//\//\\/}\\E\$/" "${bookmarks}"
         done <<< "$marks_to_delete"
 
         [[ $(wc -l <<< "${marks_to_delete}") == 1 ]] \
