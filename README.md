@@ -47,16 +47,16 @@ By default, the plugin binds the key `ctrl-g` to `fzm`.
 
 # Customization
 
-| Config                 | Default                         | Description                        |
-| ------                 | -------                         | -----------                        |
-| `FZF_MARKS_FILE`       | `${HOME}/.fzf-marks`            | File containing the marks data     |
-| `FZF_MARKS_COMMAND`    | `fzf --height 40% --reverse`    | Command used to call `fzf`         |
-| `FZF_MARKS_JUMP`       | `\C-g` (*bash*) or `^g` (*zsh*)     | Keybinding to `fzm`                |
-| `FZF_MARKS_COLOR_LHS`  | 39 (default)                    | ANSI color code of left-hand side  |
-| `FZF_MARKS_COLOR_RHS`  | 36 (cyan)                       | ANSI color code of right-hand side |
-| `FZF_MARKS_COLOR_SEP`  | 33 (yellow)                     | ANSI color code of separator       |
-| `FZF_MARKS_NO_COLORS`  | 0                               | Set this to 1 to disable colors    |
-| `FZF_MARKS_KEEP_ORDER` | 0                               | Set this to keep order of marks    |
+| Config                 | Default                         | Description                          |
+| ------                 | -------                         | -----------                          |
+| `FZF_MARKS_FILE`       | `${HOME}/.fzf-marks`            | File containing the marks data       |
+| `FZF_MARKS_COMMAND`    | `fzf --height 40% --reverse`    | Command used to call `fzf`           |
+| `FZF_MARKS_JUMP`       | `\C-g` (*bash*) or `^g` (*zsh*)     | Keybinding to `fzm`                  |
+| `FZF_MARKS_COLOR_LHS`  | 39 (default)                    | ANSI color code of left-hand side    |
+| `FZF_MARKS_COLOR_RHS`  | 36 (cyan)                       | ANSI color code of right-hand side   |
+| `FZF_MARKS_COLOR_SEP`  | 33 (yellow)                     | ANSI color code of separator         |
+| `FZF_MARKS_NO_COLORS`  | 0                               | Set this to 1 to disable colors      |
+| `FZF_MARKS_KEEP_ORDER` | 0                               | Set this to 1 to keep order of marks |
 
 See e.g. [here](http://pueblo.sourceforge.net/doc/manual/ansi_color_codes.html) for a description of ANSI color codes.
 
