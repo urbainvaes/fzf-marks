@@ -23,7 +23,7 @@
 command -v fzf >/dev/null 2>&1 || return
 
 if [[ -z "${FZF_MARKS_FILE}" ]] ; then
-    export FZF_MARKS_FILE="${HOME}/.fzf-marks"
+    FZF_MARKS_FILE="${HOME}/.fzf-marks"
 fi
 
 if [[ ! -f "${FZF_MARKS_FILE}" ]]; then
@@ -42,8 +42,6 @@ if [[ -z "${FZF_MARKS_COMMAND}" ]] ; then
     else
         FZF_MARKS_COMMAND="fzf"
     fi
-
-    export FZF_MARKS_COMMAND
 fi
 
 function mark {
@@ -119,7 +117,7 @@ function jump {
         jumpdir=$(echo "${jumpline}" | sed -n 's/.* \?: \(.*\)$/\1/p' | sed "s#~#${HOME}#")
         bookmarks=$(_handle_symlinks)
         cd "${jumpdir}" || exit
-        if ! [[ -z "${FZF_MARKS_KEEP_ORDER}" ]]; then
+        if ! [[ "${FZF_MARKS_KEEP_ORDER}" == 1 ]]; then
             perl -n -i -e "print unless /^\\Q${jumpline//\//\\/}\\E\$/" "${bookmarks}"
             echo "${jumpline}" >> "${FZF_MARKS_FILE}"
         fi
