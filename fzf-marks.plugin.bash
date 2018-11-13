@@ -60,9 +60,13 @@ function mark {
 }
 
 function _handle_symlinks {
-    local fname
+    local fname link
     if [ -L "${FZF_MARKS_FILE}" ]; then
-        fname=$(readlink "${FZF_MARKS_FILE}")
+        link=$(readlink "${FZF_MARKS_FILE}")
+        case $link in
+          /*) fname="$link";;
+          *) fname="$(dirname $FZF_MARKS_FILE)/$link";;
+        esac
     else
         fname=${FZF_MARKS_FILE}
     fi
