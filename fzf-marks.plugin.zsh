@@ -62,7 +62,7 @@ function mark {
 function _handle_symlinks {
     local fname
     if [ -L "${FZF_MARKS_FILE}" ]; then
-        fname=$(readlink -f "${FZF_MARKS_FILE}")
+        fname=$(readlink "${FZF_MARKS_FILE}")
     else
         fname=${FZF_MARKS_FILE}
     fi
