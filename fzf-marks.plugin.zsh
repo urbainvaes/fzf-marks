@@ -63,9 +63,9 @@ function _handle_symlinks {
     local fname link
     if [ -L "${FZF_MARKS_FILE}" ]; then
         link=$(readlink "${FZF_MARKS_FILE}")
-        case $link in
+        case "$link" in
           /*) fname="$link";;
-          *) fname="$(dirname $FZF_MARKS_FILE)/$link";;
+          *) fname="$(dirname "$FZF_MARKS_FILE")/$link";;
         esac
     else
         fname=${FZF_MARKS_FILE}
@@ -92,14 +92,14 @@ function _color_marks {
         c_lhs=${FZF_MARKS_COLOR_LHS:-39}
         c_rhs=${FZF_MARKS_COLOR_RHS:-36}
         c_colon=${FZF_MARKS_COLOR_COLON:-33}
-        sed "s/^\(.*\) : \(.*\)$/${esc}[${c_lhs}m\1${esc}[0m ${esc}[${c_colon}m:${esc}[0m ${esc}[${c_rhs}m\2${esc}[0m/"
+        sed "s/^\\(.*\\) : \\(.*\\)$/${esc}[${c_lhs}m\\1${esc}[0m ${esc}[${c_colon}m:${esc}[0m ${esc}[${c_rhs}m\\2${esc}[0m/"
     fi
 }
 
 function fzm {
     lines=$(_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} \
         --ansi \
-        --expect=${FZF_MARKS_DELETE:-ctrl-d} \
+        --expect="${FZF_MARKS_DELETE:-ctrl-d}" \
         --multi \
         --bind=ctrl-y:accept,ctrl-t:toggle \
         --query="$*" \
