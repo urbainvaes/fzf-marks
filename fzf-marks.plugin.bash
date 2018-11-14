@@ -114,7 +114,7 @@ function jump {
         jumpline=$(_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} --ansi --bind=ctrl-y:accept --query="$*" --select-1 --tac)
     fi
     if [[ -n ${jumpline} ]]; then
-        jumpdir=$(echo "${jumpline}" | sed -n 's/.* \?: \(.*\)$/\1/p' | sed "s#~#${HOME}#")
+        jumpdir=$(echo "${jumpline}" | sed -n 's/[^:]*: \(.*\)$/\1/p' | sed "s#~#${HOME}#")
         bookmarks=$(_handle_symlinks)
         cd "${jumpdir}" || exit
         if ! [[ "${FZF_MARKS_KEEP_ORDER}" == 1 ]]; then
