@@ -1,5 +1,3 @@
-# MIT License
-
 # Copyright (c) 2018 Urbain Vaes
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -125,9 +123,9 @@ function jump {
         jumpline=$(_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} --ansi --bind=ctrl-y:accept --query="$*" --select-1 --tac)
     fi
     if [[ -n ${jumpline} ]]; then
-        jumpdir=$(echo "${jumpline}" | sed 's/[^:]*: \(.*\)$/\1/' | sed "s#~#${HOME}#")
+        jumpdir=$(echo "${jumpline}" | sed 's/.*: \(.*\)$/\1/' | sed "s#~#${HOME}#")
         bookmarks=$(_handle_symlinks)
-        cd "${jumpdir}" || exit
+        cd "${jumpdir}" || return
         if ! [[ "${FZF_MARKS_KEEP_ORDER}" == 1 ]]; then
             perl -n -i -e "print unless /^\\Q${jumpline//\//\\/}\\E\$/" "${bookmarks}"
             echo "${jumpline}" >> "${FZF_MARKS_FILE}"
