@@ -3,6 +3,7 @@ This plugin can be used to create, delete, and navigate marks in *bash* and *zsh
 It depends on Junegunn Choi's fuzzy-finder [fzf](https://github.com/junegunn/fzf).
 
 ![](https://raw.github.com/uvaes/fuzzy-zsh-marks/demo/demo.gif)
+(This video was generated with `screenkey -g $(slop -n -f '%g')` and `simplescreenrecorder`.)
 
 # Installation
 
