@@ -31,17 +31,6 @@ echo "source $PWD/fzf-marks/fzf-marks.plugin.bash" >> ~/.bashrc
 source fzf-marks/fzf-marks.plugin.bash
 ```
 
-*Fish installation example*
-# Clone the git repository in the current directory
-git clone https://github.com/urbainvaes/fzf-marks.git
-
-# Add a line to config.fish to load the plugin whenever fish starts in interactive mode
-echo "source $PWD/fzf-marks/fzf-marks.plugin.fish" >> ~/.config/fish/config.fish
-
-# Source the plugin now so we don't have to restart fish to start using it
-source fzf-marks/fzf-marks.plugin.fish
-```
-
 # Usage
 The script exposes two functions:
 
