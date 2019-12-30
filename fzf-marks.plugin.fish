@@ -157,7 +157,9 @@ end
 
 set -q FZF_MARKS_JUMP; or set FZF_MARKS_JUMP \cg
 bind -M insert $FZF_MARKS_JUMP fzm
+bind $FZF_MARKS_JUMP fzm
 
 if test -n "$FZF_MARKS_DMARK"
     bind -M insert "$FZF_MARKS_DMARK" dmark
+    bind "$FZF_MARKS_DMARK" dmark
 end
