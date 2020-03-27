@@ -1,6 +1,6 @@
 # MIT License
 
-# Copyright (c) 2019 Marcel Patzwahl
+# Copyright (c) 2019 Marcel Patzwahl, Urbain Vaes
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -90,7 +90,7 @@ function fzm
     set -l marks_del $FZF_MARKS_DELETE
     set -lq marks_del[1]; or set marks_del[1] "ctrl-d"
 
-    set lines (_color_marks < $FZF_MARKS_FILE | $FZF_MARKS_COMMAND \
+    set lines (_color_marks < $FZF_MARKS_FILE | eval $FZF_MARKS_COMMAND \
                --ansi \
                --expect="$marks_del" \
                --multi \
