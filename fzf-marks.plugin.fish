@@ -35,7 +35,7 @@ if test -z "$FZF_MARKS_COMMAND"
     set -l minimum_version 16001
 
     if test $fzf_version -gt $minimum_version
-        set -g FZF_MARKS_COMMAND fzf --height 40% --reverse --header='ctrl-y:jump, ctrl-t:toggle, ctrl-d:delete'
+        set -g FZF_MARKS_COMMAND fzf --height 40% --reverse --header=\'ctrl-y:jump, ctrl-t:toggle, ctrl-d:delete\'
     else if test $FZF_TMUX -eq 1
         set -l tmux_height $FZF_TMUX_HEIGHT
         set -lq tmux_height[1]; or set tmux_height[1] 40
