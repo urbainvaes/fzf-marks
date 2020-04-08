@@ -1,0 +1,1 @@
+../fzf-marks.plugin.fish
