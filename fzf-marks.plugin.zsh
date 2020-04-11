@@ -93,6 +93,7 @@ function _color_marks {
 }
 
 function fzm {
+    local lines key
     lines=$(_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} \
         --ansi \
         --expect="${FZF_MARKS_DELETE:-ctrl-d}" \
