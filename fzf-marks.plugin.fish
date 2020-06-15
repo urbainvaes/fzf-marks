@@ -122,7 +122,7 @@ function jump
                 --tac)
     end
     if test -n $jumpline
-        set -l jumpdir (echo "$jumpline" | sed 's/.*: \(.*\)$/\1/' | sed "s#~#$HOME#")
+        set -l jumpdir (echo "$jumpline" | sed 's/.*: \(.*\)$/\1/' | sed "s#^~#$HOME#")
         set -l bookmarks (_handle_symlinks)
         cd $jumpdir
         commandline -f repaint
