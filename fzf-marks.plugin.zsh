@@ -99,7 +99,7 @@ function fzm {
         --expect="${FZF_MARKS_DELETE:-ctrl-d}" \
         --multi \
         --bind=ctrl-y:accept,ctrl-t:toggle \
-        --query="$*" \
+        --query="\"$*\"" \
         --select-1 \
         --tac)
     if [[ -z "$lines" ]]; then
