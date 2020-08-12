@@ -99,7 +99,7 @@ function fzm {
         --expect="${FZF_MARKS_DELETE:-ctrl-d}" \
         --multi \
         --bind=ctrl-y:accept,ctrl-t:toggle \
-        --query="$*" \
+        --query="\"$*\"" \
         --select-1 \
         --tac)
     if [[ -z "$lines" ]]; then
@@ -165,3 +165,13 @@ bindkey ${FZF_MARKS_JUMP:-'^g'} fzm
 if [ "${FZF_MARKS_DMARK}" ]; then
     bindkey ${FZF_MARKS_DMARK} dmark
 fi
+
+# Completion: for documentation, see e.g.
+# https://mads-hartmann.com/2017/08/06/writing-zsh-completion-scripts.html
+# https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org#user-content-actions
+function _fzm {
+    _arguments -C \
+        "1: :(($(sed "s/\\(.*\\) : \\(.*\\)/'\1'\\\\:'\2'/" < ~/.fzf-marks)))" \
+}
+
+compdef _fzm fzm
