@@ -156,8 +156,4 @@ if [ "${FZF_MARKS_DMARK}" ]; then
     bind "\"${FZF_MARKS_DMARK}\":\"dmark\\n\""
 fi
 
-function setup_completion {
-    complete -W "$(sed 's/\(.*\) : .*$/"\1"/' < "$FZF_MARKS_FILE")" fzm
-}
-
 setup_completion
