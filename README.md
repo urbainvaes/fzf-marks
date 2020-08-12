@@ -60,6 +60,16 @@ By default, the plugin binds the key `ctrl-g` to `fzm`.
 
 See e.g. [here](http://pueblo.sourceforge.net/doc/manual/ansi_color_codes.html) for a description of ANSI color codes.
 
+# FAQ
+
+**Question**: *Is it possible to limit the fzf search to the mark label, i.e. to exclude the path from the search?*
+
+Yes, this is possible by passing the options `-n` (for the field number to use for the search) and `-d` (for the delimiter) to `fzf`.
+For example,
+```
+FZF_MARKS_COMMAND="fzf --height 40% --reverse -n 1 -d ' : '"
+```
+
 # License
 
 MIT
