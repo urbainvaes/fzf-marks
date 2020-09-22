@@ -166,6 +166,7 @@ if [ "${FZF_MARKS_DMARK}" ]; then
     bindkey ${FZF_MARKS_DMARK} dmark
 fi
 
+command -v compdef >/dev/null 2>&1 || return
 # Completion: for documentation, see e.g.
 # https://mads-hartmann.com/2017/08/06/writing-zsh-completion-scripts.html
 # https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org#user-content-actions
