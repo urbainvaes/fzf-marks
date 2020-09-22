@@ -30,6 +30,17 @@ echo "source $PWD/fzf-marks/fzf-marks.plugin.bash" >> ~/.bashrc
 # Source the plugin now so we don't have to restart bash to start using it
 source fzf-marks/fzf-marks.plugin.bash
 ```
+
+**Enabling completion**:
+
+In `bash`, completion should be available automatically.
+In `zsh`, completion needs to be enabled explicitly before sourcing the plugin.
+This is usually done automatically by plugin managers,
+but it can also be achieved manually with the following command in your `.zshrc`.
+```zsh
+autoload -Uz compinit && compinit
+```
+
 # Usage
 The script exposes two functions:
 
