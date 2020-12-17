@@ -7,17 +7,28 @@ It depends on Junegunn Choi's fuzzy-finder [fzf](https://github.com/junegunn/fzf
 
 # Installation
 
+### Zsh
+
 If you use *zsh*, I recommend installing with a plugin manager.
 In the case of [zgen](https://github.com/tarjoilija/zgen), for example,
 simply add the following line to your plugin list:
 ```zsh
-    zgen load urbainvaes/fzf-marks
+zgen load urbainvaes/fzf-marks
 ```
+### Fish
+
+If you use *fish*, then you can use [fisher](https://github.com/jorgebucaran/fisher):
+```fish
+fisher install urbainvaes/fzf-marks
+```
+
+### Bash
 
 If you use *bash*,
 or if you use *zsh* without a plugin manager,
 source the file `fzf-marks.plugin.bash` or `fzf-marks.plugin.zsh` from your shell startup file
 to enable the plugin.
+
 
 **Bash installation example**:
 ```bash
