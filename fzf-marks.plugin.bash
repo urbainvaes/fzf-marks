@@ -92,7 +92,7 @@ function _color_marks {
 function fzm {
     lines=$(_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} \
         --ansi \
-        --expect="${FZF_MARKS_DELETE:-ctrl-d}" \
+        --expect="${FZF_MARKS_DELETE:-ctrl-d},${FZM_MARKS_PASTE:-ctrl-k}" \
         --multi \
         --bind=ctrl-y:accept,ctrl-t:toggle \
         --query="\"$*\"" \
@@ -106,6 +106,9 @@ function fzm {
 
     if [[ $key == "${FZF_MARKS_DELETE:-ctrl-d}" ]]; then
         dmark "-->-->-->" "$(sed 1d <<< "$lines")"
+    elif [[ $key == "${FZF_MARKS_PASTE:-ctrl-k}" ]]; then
+        directory=$(tail -1 <<< "$lines" | sed 's/.*: \(.*\)$/\1/' | sed "s#^~#${HOME}#")
+        echo $directory
     else
         jump "-->-->-->" "$(tail -1 <<< "${lines}")"
     fi
