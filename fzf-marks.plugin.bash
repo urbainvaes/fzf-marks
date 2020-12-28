@@ -36,7 +36,7 @@ if [[ -z "${FZF_MARKS_COMMAND}" ]] ; then
     MINIMUM_VERSION=16001
 
     if [[ $FZF_VERSION -gt $MINIMUM_VERSION ]]; then
-        FZF_MARKS_COMMAND="fzf --height 40% --reverse --header='ctrl-y:jump, ctrl-t:toggle, ctrl-d:delete'"
+        FZF_MARKS_COMMAND="fzf --height 40% --reverse --header='ctrl-y:jump, ctrl-t:toggle, ctrl-d:delete, ctrl-k:paste'"
     elif [[ ${FZF_TMUX:-1} -eq 1 ]]; then
         FZF_MARKS_COMMAND="fzf-tmux -d${FZF_TMUX_HEIGHT:-40%}"
     else
@@ -107,8 +107,7 @@ function fzm {
     if [[ $key == "${FZF_MARKS_DELETE:-ctrl-d}" ]]; then
         dmark "-->-->-->" "$(sed 1d <<< "$lines")"
     elif [[ $key == "${FZF_MARKS_PASTE:-ctrl-k}" ]]; then
-        directory=$(tail -1 <<< "$lines" | sed 's/.*: \(.*\)$/\1/' | sed "s#^~#${HOME}#")
-        echo $directory
+        pmark "$(tail -1 <<< "$lines")"
     else
         jump "-->-->-->" "$(tail -1 <<< "${lines}")"
     fi
@@ -130,6 +129,12 @@ function jump {
             echo "${jumpline}" >> "${FZF_MARKS_FILE}"
         fi
     fi
+}
+
+function pmark {
+  local selected="$(echo "${1}" | sed 's/.*: \(.*\)$/\1/' | sed "s#^~#${HOME}#")"
+  READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$selected${READLINE_LINE:$READLINE_POINT}"
+  READLINE_POINT=$(( READLINE_POINT + ${#selected} ))
 }
 
 function dmark {
@@ -154,7 +159,8 @@ function dmark {
     setup_completion
 }
 
-bind "\"${FZF_MARKS_JUMP:-\C-g}\":\"fzm\\n\""
+bind -x "\"${FZF_MARKS_JUMP:-\C-g}\":\"fzm\""
+# bind "\"${FZF_MARKS_JUMP:-\C-g}\":\"fzm\\n\""
 if [ "${FZF_MARKS_DMARK}" ]; then
     bind "\"${FZF_MARKS_DMARK}\":\"dmark\\n\""
 fi
