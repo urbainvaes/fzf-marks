@@ -34,7 +34,7 @@ if [[ -z "${FZF_MARKS_COMMAND}" ]] ; then
     MINIMUM_VERSION=16001
 
     if [[ $FZF_VERSION -gt $MINIMUM_VERSION ]]; then
-        FZF_MARKS_COMMAND="fzf --height 40% --reverse --header='ctrl-y:jump, ctrl-t:toggle, ctrl-d:delete, ctrl-k:paste'"
+        FZF_MARKS_COMMAND="fzf --height 40% --reverse --header='ctrl-y:jump, ctrl-t:toggle, ctrl-d:delete'"
     elif [[ ${FZF_TMUX:-1} -eq 1 ]]; then
         FZF_MARKS_COMMAND="fzf-tmux -d${FZF_TMUX_HEIGHT:-40%}"
     else
@@ -96,7 +96,7 @@ function fzm {
     local lines key
     lines=$(_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} \
         --ansi \
-        --expect="${FZF_MARKS_DELETE:-ctrl-d},${FZM_MARKS_PASTE:-ctrl-k}" \
+        --expect="${FZF_MARKS_DELETE:-ctrl-d}" \
         --multi \
         --bind=ctrl-y:accept,ctrl-t:toggle \
         --query="\"$*\"" \
@@ -111,8 +111,6 @@ function fzm {
 
     if [[ $key == "${FZF_MARKS_DELETE:-ctrl-d}" ]]; then
         dmark "-->-->-->" "$(sed 1d <<< "$lines")"
-    elif [[ $key == "${FZF_MARKS_PASTE:-ctrl-k}" ]]; then
-        pmark "$(tail -1 <<< "$lines")"
     else
         jump "-->-->-->" "$(tail -1 <<< "${lines}")"
     fi
@@ -135,10 +133,6 @@ function jump {
         fi
     fi
     zle && zle redraw-prompt
-}
-
-function pmark {
-    echo $(echo "${1}" | sed 's/.*: \(.*\)$/\1/' | sed "s#^~#${HOME}#")
 }
 
 function dmark {
@@ -164,7 +158,6 @@ function dmark {
 }
 
 zle -N jump
-zle -N pmark
 zle -N dmark
 zle -N fzm
 
