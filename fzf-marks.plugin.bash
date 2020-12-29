@@ -159,8 +159,9 @@ function dmark {
     setup_completion
 }
 
-bind -x "\"${FZF_MARKS_JUMP:-\C-g}\":\"fzm\""
-# bind "\"${FZF_MARKS_JUMP:-\C-g}\":\"fzm\\n\""
+bind -x '"\202": "fzm"'
+bind '"\C-g": "\202 \C-a\C-k\C-m\C-y\C-h"'
+
 if [ "${FZF_MARKS_DMARK}" ]; then
     bind "\"${FZF_MARKS_DMARK}\":\"dmark\\n\""
 fi
