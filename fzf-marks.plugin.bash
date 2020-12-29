@@ -159,8 +159,11 @@ function dmark {
     setup_completion
 }
 
+# macros to maintain state (\200 will save the line \201 will set it again)
+bind -x '"\200": TEMP_LINE=$READLINE_LINE; TEMP_POINT=$READLINE_POINT'
+bind -x '"\201": READLINE_LINE=$TEMP_LINE; READLINE_POINT=$TEMP_POINT; unset TEMP_POINT; unset TEMP_LINE'
 bind -x '"\202": "fzm"'
-bind '"\C-g": "\202 \C-a\C-k\C-m\C-y\C-h"'
+bind '"\C-g":"\202\200\C-a\C-k\C-m\201"'
 
 if [ "${FZF_MARKS_DMARK}" ]; then
     bind "\"${FZF_MARKS_DMARK}\":\"dmark\\n\""
