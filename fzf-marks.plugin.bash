@@ -133,8 +133,12 @@ function jump {
 
 function pmark {
   local selected="$(echo "${1}" | sed 's/.*: \(.*\)$/\1/' | sed "s#^~#${HOME}#")"
-  READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$selected${READLINE_LINE:$READLINE_POINT}"
-  READLINE_POINT=$(( READLINE_POINT + ${#selected} ))
+  if [ "${BASH_VERSINFO[0]}" -lt 4 ]; then
+      printf '%q' "$selected"
+  else
+      READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$selected${READLINE_LINE:$READLINE_POINT}"
+      READLINE_POINT=$(( READLINE_POINT + ${#selected} ))
+  fi
 }
 
 function dmark {
@@ -159,14 +163,29 @@ function dmark {
     setup_completion
 }
 
-# macros to maintain state (\200 will save the line \201 will set it again)
-bind -x '"\200": TEMP_LINE=$READLINE_LINE; TEMP_POINT=$READLINE_POINT'
-bind -x '"\201": READLINE_LINE=$TEMP_LINE; READLINE_POINT=$TEMP_POINT; unset TEMP_POINT; unset TEMP_LINE'
-bind -x '"\202": "fzm"'
-bind '"\C-g":"\202\200\C-a\C-k\C-m\201"'
+function set-up-fzm-bindings {
+    if [ "${BASH_VERSINFO[0]}" -lt 4 ]; then
+        bind "\"\C-g\":\"fzm\C-m\""
+    else
+        local mark1='\200' mark2='\201' mark3='\202'
 
-if [ "${FZF_MARKS_DMARK}" ]; then
-    bind "\"${FZF_MARKS_DMARK}\":\"dmark\\n\""
-fi
+        # Change markers for UTF-8 encodings
+        local locale=${LC_ALL:-${LC_CTYPE:-$LANG}}
+        local rex_utf8='\.([uU][tT][fF]-?8)$'
+        if [[ $locale =~ $rex_utf8 ]]; then
+          mark1='\302\200' mark2='\302\201' mark3='\302\202'
+        fi
+        bind -x "\"$mark1\": TEMP_LINE=\$READLINE_LINE TEMP_POINT=\$READLINE_POINT"
+        bind -x "\"$mark2\": READLINE_LINE=\$TEMP_LINE READLINE_POINT=\$TEMP_POINT; unset -v TEMP_POINT TEMP_LINE"
+        bind -x "\"$mark3\": fzm"
+        bind "\"\C-g\":\"$mark3$mark1\C-a\C-k\C-m$mark2\""
+    fi
 
+    if [ "${FZF_MARKS_DMARK}" ]; then
+        bind "\"${FZF_MARKS_DMARK}\":\"dmark\\n\""
+    fi
+}
+
+set-up-fzm-bindings
 setup_completion
+
