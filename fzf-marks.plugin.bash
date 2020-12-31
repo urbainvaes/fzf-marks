@@ -182,7 +182,7 @@ function set-up-fzm-bindings {
         bind -x "\"$mark1\": _FZF_MARKS_LINE=\$READLINE_LINE _FZF_MARKS_POINT=\$READLINE_POINT"
         bind -x "\"$mark2\": READLINE_LINE=\$_FZF_MARKS_LINE READLINE_POINT=\$_FZF_MARKS_POINT; unset -v _FZF_MARKS_POINT _FZF_MARKS_LINE"
         bind -x "\"$mark3\": fzm"
-        bind "\"\C-g\":\"$mark3$mark1\C-a\C-k\C-m$mark2\""
+        bind "\"${FZF_MARKS_JUMP:-\C-g}\":\"$mark3$mark1\C-a\C-k\C-m$mark2\""
     fi
 
     if [ "${FZF_MARKS_DMARK}" ]; then
