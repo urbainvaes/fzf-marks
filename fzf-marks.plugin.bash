@@ -133,7 +133,9 @@ function jump {
 
 function pmark {
   local selected="$(echo "${1}" | sed 's/.*: \(.*\)$/\1/' | sed "s#^~#${HOME}#")"
-  if [ "${BASH_VERSINFO[0]}" -lt 4 ]; then
+  if [[ $_ble_attached ]]; then
+      ble/widget/insert-string "$selected"
+  elif [ "${BASH_VERSINFO[0]}" -lt 4 ]; then
       printf '%q' "$selected"
   else
       READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$selected${READLINE_LINE:$READLINE_POINT}"
@@ -164,7 +166,9 @@ function dmark {
 }
 
 function set-up-fzm-bindings {
-    if [ "${BASH_VERSINFO[0]}" -lt 4 ]; then
+    if [[ $BLE_VERSION ]]; then
+        ble-bind -c 'C-g' 'fzm'
+    elif [ "${BASH_VERSINFO[0]}" -lt 4 ]; then
         bind "\"\C-g\":\"fzm\C-m\""
     else
         local mark1='\200' mark2='\201' mark3='\202'
@@ -175,8 +179,8 @@ function set-up-fzm-bindings {
         if [[ $locale =~ $rex_utf8 ]]; then
           mark1='\302\200' mark2='\302\201' mark3='\302\202'
         fi
-        bind -x "\"$mark1\": TEMP_LINE=\$READLINE_LINE TEMP_POINT=\$READLINE_POINT"
-        bind -x "\"$mark2\": READLINE_LINE=\$TEMP_LINE READLINE_POINT=\$TEMP_POINT; unset -v TEMP_POINT TEMP_LINE"
+        bind -x "\"$mark1\": _FZF_MARKS_LINE=\$READLINE_LINE _FZF_MARKS_POINT=\$READLINE_POINT"
+        bind -x "\"$mark2\": READLINE_LINE=\$_FZF_MARKS_LINE READLINE_POINT=\$_FZF_MARKS_POINT; unset -v _FZF_MARKS_POINT _FZF_MARKS_LINE"
         bind -x "\"$mark3\": fzm"
         bind "\"\C-g\":\"$mark3$mark1\C-a\C-k\C-m$mark2\""
     fi
