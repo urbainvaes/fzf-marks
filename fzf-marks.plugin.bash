@@ -36,7 +36,7 @@ if [[ -z "${FZF_MARKS_COMMAND}" ]] ; then
     MINIMUM_VERSION=16001
 
     if [[ $FZF_VERSION -gt $MINIMUM_VERSION ]]; then
-        FZF_MARKS_COMMAND="fzf --height 40% --reverse --header='ctrl-y:jump, ctrl-t:toggle, ctrl-d:delete'"
+        FZF_MARKS_COMMAND="fzf --height 40% --reverse --header='ctrl-y:jump, ctrl-t:toggle, ctrl-d:delete, ctrl-k:paste'"
     elif [[ ${FZF_TMUX:-1} -eq 1 ]]; then
         FZF_MARKS_COMMAND="fzf-tmux -d${FZF_TMUX_HEIGHT:-40%}"
     else
@@ -107,8 +107,7 @@ function fzm {
     if [[ $key == "${FZF_MARKS_DELETE:-ctrl-d}" ]]; then
         dmark "-->-->-->" "$(sed 1d <<< "$lines")"
     elif [[ $key == "${FZF_MARKS_PASTE:-ctrl-k}" ]]; then
-        directory=$(tail -1 <<< "$lines" | sed 's/.*: \(.*\)$/\1/' | sed "s#^~#${HOME}#")
-        echo $directory
+        pmark "$(tail -1 <<< "$lines")"
     else
         jump "-->-->-->" "$(tail -1 <<< "${lines}")"
     fi
@@ -130,6 +129,18 @@ function jump {
             echo "${jumpline}" >> "${FZF_MARKS_FILE}"
         fi
     fi
+}
+
+function pmark {
+  local selected="$(echo "${1}" | sed 's/.*: \(.*\)$/\1/' | sed "s#^~#${HOME}#")"
+  if [[ $_ble_attached ]]; then
+      ble/widget/insert-string "$selected"
+  elif [ "${BASH_VERSINFO[0]}" -lt 4 ]; then
+      printf '%q' "$selected"
+  else
+      READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$selected${READLINE_LINE:$READLINE_POINT}"
+      READLINE_POINT=$(( READLINE_POINT + ${#selected} ))
+  fi
 }
 
 function dmark {
@@ -154,9 +165,31 @@ function dmark {
     setup_completion
 }
 
-bind "\"${FZF_MARKS_JUMP:-\C-g}\":\"fzm\\n\""
-if [ "${FZF_MARKS_DMARK}" ]; then
-    bind "\"${FZF_MARKS_DMARK}\":\"dmark\\n\""
-fi
+function set-up-fzm-bindings {
+    if [[ $BLE_VERSION ]]; then
+        ble-bind -c 'C-g' 'fzm'
+    elif [ "${BASH_VERSINFO[0]}" -lt 4 ]; then
+        bind "\"\C-g\":\"fzm\C-m\""
+    else
+        local mark1='\200' mark2='\201' mark3='\202'
 
+        # Change markers for UTF-8 encodings
+        local locale=${LC_ALL:-${LC_CTYPE:-$LANG}}
+        local rex_utf8='\.([uU][tT][fF]-?8)$'
+        if [[ $locale =~ $rex_utf8 ]]; then
+          mark1='\302\200' mark2='\302\201' mark3='\302\202'
+        fi
+        bind -x "\"$mark1\": _FZF_MARKS_LINE=\$READLINE_LINE _FZF_MARKS_POINT=\$READLINE_POINT"
+        bind -x "\"$mark2\": READLINE_LINE=\$_FZF_MARKS_LINE READLINE_POINT=\$_FZF_MARKS_POINT; unset -v _FZF_MARKS_POINT _FZF_MARKS_LINE"
+        bind -x "\"$mark3\": fzm"
+        bind "\"${FZF_MARKS_JUMP:-\C-g}\":\"$mark3$mark1\C-a\C-k\C-m$mark2\""
+    fi
+
+    if [ "${FZF_MARKS_DMARK}" ]; then
+        bind "\"${FZF_MARKS_DMARK}\":\"dmark\\n\""
+    fi
+}
+
+set-up-fzm-bindings
 setup_completion
+
