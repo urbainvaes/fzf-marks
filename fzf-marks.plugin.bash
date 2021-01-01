@@ -299,8 +299,9 @@ function ble/widget/fzm {
 }
 
 function set-up-fzm-bindings {
-    if [[ $BLE_VERSION ]]; then
-        ble-bind -f 'C-g' 'fzm'
+    local jump_key=${FZF_MARKS_JUMP:-'\C-g'}
+    if ((_ble_version>=400)); then
+        ble-bind -f keyseq:"$jump_key" 'fzm'
     else
         # Intiialize special keys used for key bindings
         _fzm_key1='\200'
@@ -319,7 +320,7 @@ function set-up-fzm-bindings {
         fi
 
         bind -x "\"$_fzm_key1\": _fzm-widget"
-        bind "\"${FZF_MARKS_JUMP:-\C-g}\":\"$_fzm_key1$_fzm_key2\""
+        bind "\"$jump_key\":\"$_fzm_key1$_fzm_key2\""
     fi
 
     if [ "${FZF_MARKS_DMARK}" ]; then
