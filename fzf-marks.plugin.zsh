@@ -34,7 +34,7 @@ if [[ -z "${FZF_MARKS_COMMAND}" ]] ; then
     MINIMUM_VERSION=16001
 
     if [[ $FZF_VERSION -gt $MINIMUM_VERSION ]]; then
-        FZF_MARKS_COMMAND="fzf --height 40% --reverse --header='ctrl-y:jump, ctrl-t:toggle, ctrl-d:delete, ctrl-k:paste'"
+        FZF_MARKS_COMMAND="fzf --height 40% --reverse --header=\"\$_fzm_keymap_description\""
     elif [[ ${FZF_TMUX:-1} -eq 1 ]]; then
         FZF_MARKS_COMMAND="fzf-tmux -d${FZF_TMUX_HEIGHT:-40%}"
     else
@@ -99,10 +99,11 @@ function _fzm_paste_command {
 }
 
 function fzm {
-    local lines key
-    lines=$(_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} \
+    local delete_key=${FZF_MARKS_DELETE:-ctrl-d} paste_key=${FZF_MARKS_PASTE:-ctrl-k}
+    local _fzm_keymap_description="ctrl-y:jump, ctrl-t:toggle, ${delete_key}:delete, ${paste_key}:paste"
+    local lines=$(_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} \
         --ansi \
-        --expect='"${FZF_MARKS_DELETE:-ctrl-d},${FZM_MARKS_PASTE:-ctrl-k}"' \
+        --expect='"$delete_key,$paste_key"' \
         --multi \
         --bind=ctrl-y:accept,ctrl-t:toggle \
         --query='"$*"' \
@@ -113,11 +114,11 @@ function fzm {
         return 1
     fi
 
-    key=$(head -1 <<< "$lines")
+    local key=$(head -1 <<< "$lines")
 
-    if [[ $key == "${FZF_MARKS_DELETE:-ctrl-d}" ]]; then
+    if [[ $key == "$delete_key" ]]; then
         dmark "-->-->-->" "$(sed 1d <<< "$lines")"
-    elif [[ $key == "${FZF_MARKS_PASTE:-ctrl-k}" ]]; then
+    elif [[ $key == "$paste_key" ]]; then
         zle && local FZF_MARKS_PASTE_COMMAND=_fzm_paste_command
         pmark "-->-->-->" "$(tail -1 <<< "$lines")"
     else
@@ -130,6 +131,7 @@ function jump {
     if [[ $1 == "-->-->-->" ]]; then
         jumpline=$2
     else
+        local _fzm_keymap_description="ctrl-y:jump"
         jumpline=$(_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} --ansi --bind=ctrl-y:accept --query='"$*"' --select-1 --tac)
     fi
     if [[ -n ${jumpline} ]]; then
@@ -164,6 +166,7 @@ function dmark {
     if [[ $1 == "-->-->-->" ]]; then
         marks_to_delete=$2
     else
+        local _fzm_keymap_description="ctrl-y:delete, ctrl-t:toggle"
         marks_to_delete=$(_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} -m --ansi --bind=ctrl-y:accept,ctrl-t:toggle --query='"$*"' --tac)
     fi
     bookmarks=$(_handle_symlinks)
