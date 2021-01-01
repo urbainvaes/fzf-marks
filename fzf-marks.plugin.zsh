@@ -92,6 +92,12 @@ function _color_marks {
     fi
 }
 
+function _fzm_paste_command {
+    local directory="$1"
+    LBUFFER="${LBUFFER}$directory"
+    zle reset-prompt > /dev/null 2>&1
+}
+
 function fzm {
     local lines key
     lines=$(_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} \
@@ -112,9 +118,8 @@ function fzm {
     if [[ $key == "${FZF_MARKS_DELETE:-ctrl-d}" ]]; then
         dmark "-->-->-->" "$(sed 1d <<< "$lines")"
     elif [[ $key == "${FZF_MARKS_PASTE:-ctrl-k}" ]]; then
-        directory=$(tail -1 <<< "$lines" | sed 's/.*: \(.*\)$/\1/' | sed "s#^~#${HOME}#")
-        LBUFFER="${LBUFFER}$directory"
-        zle reset-prompt > /dev/null 2>&1 || echo $directory
+        zle && local FZF_MARKS_PASTE_COMMAND=_fzm_paste_command
+        pmark "$(tail -1 <<< "$lines")"
     else
         jump "-->-->-->" "$(tail -1 <<< "${lines}")"
     fi
@@ -137,6 +142,12 @@ function jump {
         fi
     fi
     zle && zle redraw-prompt
+}
+
+function pmark {
+    local selected=$(echo "${1}" | sed 's/.*: \(.*\)$/\1/' | sed "s#^~#${HOME}#")
+    local paste_command=${FZF_MARKS_PASTE_COMMAND:-"printf '%s\n'"}
+    eval -- "$paste_command \"\$selected\""
 }
 
 function dmark {

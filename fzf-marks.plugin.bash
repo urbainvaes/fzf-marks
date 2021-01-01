@@ -132,15 +132,9 @@ function jump {
 }
 
 function pmark {
-  local selected="$(echo "${1}" | sed 's/.*: \(.*\)$/\1/' | sed "s#^~#${HOME}#")"
-  if [[ $_ble_attached ]]; then
-      ble/widget/insert-string "$selected"
-  elif [ "${BASH_VERSINFO[0]}" -lt 4 ]; then
-      printf '%q' "$selected"
-  else
-      READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$selected${READLINE_LINE:$READLINE_POINT}"
-      READLINE_POINT=$(( READLINE_POINT + ${#selected} ))
-  fi
+    local selected="$(echo "${1}" | sed 's/.*: \(.*\)$/\1/' | sed "s#^~#${HOME}#")"
+    local paste_command=${FZF_MARKS_PASTE_COMMAND:-"printf '%s\n'"}
+    eval -- "$paste_command \"\$selected\""
 }
 
 function dmark {
@@ -165,11 +159,148 @@ function dmark {
     setup_completion
 }
 
+if ((BASH_VERSINFO[0] >= 4)); then
+    # Widget for Bash 4.0+
+
+    # bashbug https://lists.gnu.org/archive/html/bug-bash/2018-04/msg00040.html
+    function _fzm-widget-has_readline_point_bug {
+      [[ BASH_VERSINFO[0] -lt 5 && ! $_ble_attached ]]
+    }
+    function _fzm-widget-has_readline_mark {
+      [[ BASH_VERSINFO[0] -ge 5 || $_ble_attached ]]
+    }
+    function _fzm-widget-insert {
+        local insert=$1
+
+        # Work around bashbug
+        if _fzm-widget-has_readline_point_bug; then
+            # Convert READLINE_POINT from bytes to characters
+            local old_lc_all=$LC_ALL old_lc_ctype=$LC_CTYPE
+            local LC_ALL= LC_CTYPE=C
+            local head=${READLINE_LINE::READLINE_POINT}
+            LC_ALL=$old_lc_all LC_CTYPE=$old_lc_ctype
+            READLINE_POINT=${#head}
+        fi
+
+        READLINE_LINE=${READLINE_LINE::READLINE_POINT}$insert${READLINE_LINE:READLINE_POINT}
+        if _fzm-widget-has_readline_mark && ((READLINE_MARK > READLINE_POINT)); then
+            # Bash 5.0 has new variable READLINE_MARK
+            ((READLINE_MARK += ${#insert}))
+        fi
+        ((READLINE_POINT += ${#insert}))
+
+        # Work around bashbug
+        if _fzm-widget-has_readline_point_bug; then
+            # Convert READLINE_POINT from characters to bytes
+            local head=${READLINE_LINE::READLINE_POINT}
+            local LC_ALL= LC_CTYPE=C
+            READLINE_POINT=${#head}
+            LC_ALL=$old_lc_all LC_CTYPE=$old_lc_ctype
+        fi
+    } 2>/dev/null # Suppress locale error messages
+    function _fzm-widget-stash_line {
+        _fzm_line=$READLINE_LINE
+        _fzm_point=$READLINE_POINT
+        READLINE_LINE=
+        READLINE_POINT=0
+        if _fzm-widget-has_readline_mark; then
+            _fzm_mark=$READLINE_MARK
+            READLINE_MARK=0
+        fi
+    }
+    function _fzm-widget-pop_line {
+        READLINE_LINE=$_fzm_line
+        READLINE_POINT=$_fzm_point
+        if _fzm-widget-has_readline_mark; then
+             READLINE_MARK=$_fzm_mark
+        fi
+    }
+    function _fzm-widget {
+        local pwd=$PWD
+        local FZF_MARKS_PASTE_COMMAND=_fzm-widget-insert
+        fzm
+
+        if [[ $PWD != "$pwd" ]]; then
+            # Force the prompt update
+            _fzm-widget-stash_line
+            bind "\"$_fzm_key2\": \"\C-m$_fzm_key3\""
+            bind -x "\"$_fzm_key3\": _fzm-widget-pop_line"
+        else
+            bind "\"$_fzm_key2\": \"\""
+        fi
+    }
+
+else
+    # Widget for Bash 3.0-3.2
+    function _fzm-widget-untranslate_keyseq {
+        local value=$1
+        if [[ $value == *[\'\"$'\001'-$'\037']* ]]; then
+            local a b
+            a='\' b='\\' value=${value//$a/$b}
+            a='"' b='\"' value=${value//$a/$b}
+            a=$'\001' b='\C-q\001' value=${value//$a/$b}
+            a=$'\002' b='\C-q\002' value=${value//$a/$b}
+            a=$'\003' b='\C-q\003' value=${value//$a/$b}
+            a=$'\004' b='\C-q\004' value=${value//$a/$b}
+            a=$'\005' b='\C-q\005' value=${value//$a/$b}
+            a=$'\006' b='\C-q\006' value=${value//$a/$b}
+            a=$'\007' b='\C-q\007' value=${value//$a/$b}
+            a=$'\010' b='\C-q\010' value=${value//$a/$b}
+            a=$'\011' b='\C-q\011' value=${value//$a/$b}
+            a=$'\012' b='\C-q\012' value=${value//$a/$b}
+            a=$'\013' b='\C-q\013' value=${value//$a/$b}
+            a=$'\014' b='\C-q\014' value=${value//$a/$b}
+            a=$'\015' b='\C-q\015' value=${value//$a/$b}
+            a=$'\016' b='\C-q\016' value=${value//$a/$b}
+            a=$'\017' b='\C-q\017' value=${value//$a/$b}
+            a=$'\020' b='\C-q\020' value=${value//$a/$b}
+            a=$'\021' b='\C-q\021' value=${value//$a/$b}
+            a=$'\022' b='\C-q\022' value=${value//$a/$b}
+            a=$'\023' b='\C-q\023' value=${value//$a/$b}
+            a=$'\024' b='\C-q\024' value=${value//$a/$b}
+            a=$'\025' b='\C-q\025' value=${value//$a/$b}
+            a=$'\026' b='\C-q\026' value=${value//$a/$b}
+            a=$'\027' b='\C-q\027' value=${value//$a/$b}
+            a=$'\030' b='\C-q\030' value=${value//$a/$b}
+            a=$'\031' b='\C-q\031' value=${value//$a/$b}
+            a=$'\032' b='\C-q\032' value=${value//$a/$b}
+            a=$'\033' b='\C-q\033' value=${value//$a/$b}
+            a=$'\034' b='\C-q\034' value=${value//$a/$b}
+            a=$'\035' b='\C-q\035' value=${value//$a/$b}
+            a=$'\036' b='\C-q\036' value=${value//$a/$b}
+            a=$'\037' b='\C-q\037' value=${value//$a/$b}
+        fi
+        _fzm_keyseq=$value
+    }
+    function _fzm-widget {
+        local pwd=$PWD
+        local FZF_MARKS_PASTE_COMMAND=_fzm-widget-untranslate_keyseq _fzm_keyseq=
+        fzm
+
+        if [[ $PWD != "$pwd" ]]; then
+            # Force the prompt update
+            _fzm_keyseq=' \C-b\C-k \C-u\C-m\C-y\C-?\e \C-y\ey\C-x\C-x\C-d'$_fzm_keyseq
+        fi
+        bind "\"$_fzm_key2\": \"$_fzm_keyseq\""
+    }
+fi
+
+# Widget for ble.sh
+function ble/widget/fzm {
+    ble/widget/.hide-current-line
+    ble/util/buffer.flush >&2
+
+    local pwd=$PWD
+    local FZF_MARKS_PASTE_COMMAND=ble/widget/insert-string
+    fzm
+
+    # Force the prompt update
+    [[ $PWD != "$pwd" ]] && ble/prompt/clear
+}
+
 function set-up-fzm-bindings {
     if [[ $BLE_VERSION ]]; then
-        ble-bind -c 'C-g' 'fzm'
-    elif [ "${BASH_VERSINFO[0]}" -lt 4 ]; then
-        bind "\"\C-g\":\"fzm\C-m\""
+        ble-bind -f 'C-g' 'fzm'
     else
         # Intiialize special keys used for key bindings
         _fzm_key1='\200'
@@ -187,10 +318,8 @@ function set-up-fzm-bindings {
             _fzm_key3='\xFD'
         fi
 
-        bind -x "\"$_fzm_key2\": _FZF_MARKS_LINE=\$READLINE_LINE _FZF_MARKS_POINT=\$READLINE_POINT"
-        bind -x "\"$_fzm_key3\": READLINE_LINE=\$_FZF_MARKS_LINE READLINE_POINT=\$_FZF_MARKS_POINT; unset -v _FZF_MARKS_POINT _FZF_MARKS_LINE"
-        bind -x "\"$_fzm_key1\": fzm"
-        bind "\"${FZF_MARKS_JUMP:-\C-g}\":\"$_fzm_key1$_fzm_key2\C-a\C-k\C-m$_fzm_key3\""
+        bind -x "\"$_fzm_key1\": _fzm-widget"
+        bind "\"${FZF_MARKS_JUMP:-\C-g}\":\"$_fzm_key1$_fzm_key2\""
     fi
 
     if [ "${FZF_MARKS_DMARK}" ]; then
@@ -200,4 +329,3 @@ function set-up-fzm-bindings {
 
 set-up-fzm-bindings
 setup_completion
-
