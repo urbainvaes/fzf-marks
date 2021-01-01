@@ -324,7 +324,7 @@ function set-up-fzm-bindings {
     fi
 
     if [ "${FZF_MARKS_DMARK}" ]; then
-        bind "\"${FZF_MARKS_DMARK}\":\"dmark\\n\""
+        bind -x "\"${FZF_MARKS_DMARK}\": dmark"
     fi
 }
 
