@@ -171,18 +171,26 @@ function set-up-fzm-bindings {
     elif [ "${BASH_VERSINFO[0]}" -lt 4 ]; then
         bind "\"\C-g\":\"fzm\C-m\""
     else
-        local mark1='\200' mark2='\201' mark3='\202'
-
-        # Change markers for UTF-8 encodings
+        # Intiialize special keys used for key bindings
+        _fzm_key1='\200'
+        _fzm_key2='\201'
+        _fzm_key3='\202'
         local locale=${LC_ALL:-${LC_CTYPE:-$LANG}}
         local rex_utf8='\.([uU][tT][fF]-?8)$'
         if [[ $locale =~ $rex_utf8 ]]; then
-          mark1='\302\200' mark2='\302\201' mark3='\302\202'
+            # Change keys for UTF-8 encodings:
+            # Two-byte sequence does not work for Bash 3 and 4.
+            # \xC0-\xC1 and \xF5-\xFF are unused bytes in UTF-8.
+            # Bash 4 unintendedly exits with \xFE-\xFF.
+            _fzm_key1='\xC0'
+            _fzm_key2='\xC1'
+            _fzm_key3='\xFD'
         fi
-        bind -x "\"$mark1\": _FZF_MARKS_LINE=\$READLINE_LINE _FZF_MARKS_POINT=\$READLINE_POINT"
-        bind -x "\"$mark2\": READLINE_LINE=\$_FZF_MARKS_LINE READLINE_POINT=\$_FZF_MARKS_POINT; unset -v _FZF_MARKS_POINT _FZF_MARKS_LINE"
-        bind -x "\"$mark3\": fzm"
-        bind "\"${FZF_MARKS_JUMP:-\C-g}\":\"$mark3$mark1\C-a\C-k\C-m$mark2\""
+
+        bind -x "\"$_fzm_key2\": _FZF_MARKS_LINE=\$READLINE_LINE _FZF_MARKS_POINT=\$READLINE_POINT"
+        bind -x "\"$_fzm_key3\": READLINE_LINE=\$_FZF_MARKS_LINE READLINE_POINT=\$_FZF_MARKS_POINT; unset -v _FZF_MARKS_POINT _FZF_MARKS_LINE"
+        bind -x "\"$_fzm_key1\": fzm"
+        bind "\"${FZF_MARKS_JUMP:-\C-g}\":\"$_fzm_key1$_fzm_key2\C-a\C-k\C-m$_fzm_key3\""
     fi
 
     if [ "${FZF_MARKS_DMARK}" ]; then
