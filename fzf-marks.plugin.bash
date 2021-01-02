@@ -92,10 +92,10 @@ function _color_marks {
 function fzm {
     lines=$(_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} \
         --ansi \
-        --expect="${FZF_MARKS_DELETE:-ctrl-d},${FZM_MARKS_PASTE:-ctrl-k}" \
+        --expect='"${FZF_MARKS_DELETE:-ctrl-d},${FZM_MARKS_PASTE:-ctrl-k}"' \
         --multi \
         --bind=ctrl-y:accept,ctrl-t:toggle \
-        --query="\"$*\"" \
+        --query='"$*"' \
         --select-1 \
         --tac)
     if [[ -z "$lines" ]]; then
@@ -118,7 +118,7 @@ function jump {
     if [[ $1 == "-->-->-->" ]]; then
         jumpline=$2
     else
-        jumpline=$(_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} --ansi --bind=ctrl-y:accept --query="$*" --select-1 --tac)
+        jumpline=$(_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} --ansi --bind=ctrl-y:accept --query='"$*"' --select-1 --tac)
     fi
     if [[ -n ${jumpline} ]]; then
         jumpdir=$(echo "${jumpline}" | sed 's/.*: \(.*\)$/\1/' | sed "s#^~#${HOME}#")
@@ -142,7 +142,7 @@ function dmark {
     if [[ $1 == "-->-->-->" ]]; then
         marks_to_delete=$2
     else
-        marks_to_delete=$(_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} -m --ansi --bind=ctrl-y:accept,ctrl-t:toggle --query="$*" --tac)
+        marks_to_delete=$(_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} -m --ansi --bind=ctrl-y:accept,ctrl-t:toggle --query='"$*"' --tac)
     fi
     bookmarks=$(_handle_symlinks)
 
