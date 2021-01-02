@@ -99,7 +99,7 @@ function _fzm_paste_command {
 }
 
 function fzm {
-    local delete_key=${FZF_MARKS_DELETE:-ctrl-d} paste_key=${FZF_MARKS_PASTE:-ctrl-k}
+    local delete_key=${FZF_MARKS_DELETE:-ctrl-d} paste_key=${FZF_MARKS_PASTE:-ctrl-v}
     local _fzm_keymap_description="ctrl-y:jump, ctrl-t:toggle, ${delete_key}:delete, ${paste_key}:paste"
     local lines=$(_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} \
         --ansi \
