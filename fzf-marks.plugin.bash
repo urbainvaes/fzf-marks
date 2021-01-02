@@ -108,7 +108,7 @@ function fzm {
 
     if [[ $key == "$delete_key" ]]; then
         dmark "-->-->-->" "$(sed 1d <<< "$lines")"
-    elif [[ $key == "$paste_key" ]]; then
+    elif [[ $key == "$paste_key" || ! -t 1 ]]; then
         pmark "-->-->-->" "$(tail -1 <<< "$lines")"
     else
         jump "-->-->-->" "$(tail -1 <<< "${lines}")"
