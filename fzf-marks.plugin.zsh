@@ -49,7 +49,7 @@ function mark {
     if grep -qxFe "${mark_to_add}" "${FZF_MARKS_FILE}"; then
         echo "** The following mark already exists **"
     else
-        echo "${mark_to_add}" >> "${FZF_MARKS_FILE}"
+        printf '%s\n' "${mark_to_add}" >> "${FZF_MARKS_FILE}"
         echo "** The following mark has been added **"
     fi
     _fzm_color_marks <<< "${mark_to_add}"
@@ -66,7 +66,7 @@ function _fzm_handle_symlinks {
     else
         fname=${FZF_MARKS_FILE}
     fi
-    echo "${fname}"
+    printf '%s\n' "${fname}"
 }
 
 # Ensure precmds are run after cd
@@ -140,7 +140,7 @@ function jump {
         cd "${jumpdir}" || return
         if ! [[ "${FZF_MARKS_KEEP_ORDER}" == 1 ]]; then
             perl -n -i -e "print unless /^\\Q${jumpline//\//\\/}\\E\$/" "${bookmarks}"
-            echo "${jumpline}" >> "${FZF_MARKS_FILE}"
+            printf '%s\n' "${jumpline}" >> "${FZF_MARKS_FILE}"
         fi
     fi
     zle && zle redraw-prompt
