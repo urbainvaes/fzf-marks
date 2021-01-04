@@ -30,10 +30,10 @@ fi
 
 if [[ -z "${FZF_MARKS_COMMAND}" ]] ; then
 
-    FZF_VERSION=$(fzf --version | awk -F. '{ print $1 * 1e6 + $2 * 1e3 + $3 }')
-    MINIMUM_VERSION=16001
+    _fzm_FZF_VERSION=$(fzf --version | awk -F. '{ print $1 * 1e6 + $2 * 1e3 + $3 }')
+    _fzm_MINIMUM_VERSION=16001
 
-    if [[ $FZF_VERSION -gt $MINIMUM_VERSION ]]; then
+    if [[ $_fzm_FZF_VERSION -gt $_fzm_MINIMUM_VERSION ]]; then
         FZF_MARKS_COMMAND="fzf --height 40% --reverse --header=\"\$_fzm_keymap_description\""
     elif [[ ${FZF_TMUX:-1} -eq 1 ]]; then
         FZF_MARKS_COMMAND="fzf-tmux -d${FZF_TMUX_HEIGHT:-40%}"
