@@ -44,7 +44,7 @@ if [[ -z "${FZF_MARKS_COMMAND}" ]] ; then
     fi
 fi
 
-function setup_completion {
+function _fzm_setup_completion {
     complete -W "$(sed 's/\(.*\) : .*$/"\1"/' < "$FZF_MARKS_FILE")" fzm
 }
 
@@ -58,11 +58,11 @@ function mark {
         echo "${mark_to_add}" >> "${FZF_MARKS_FILE}"
         echo "** The following mark has been added **"
     fi
-    echo "${mark_to_add}" | _color_marks
-    setup_completion
+    echo "${mark_to_add}" | _fzm_color_marks
+    _fzm_setup_completion
 }
 
-function _handle_symlinks {
+function _fzm_handle_symlinks {
     local fname link
     if [ -L "${FZF_MARKS_FILE}" ]; then
         link=$(readlink "${FZF_MARKS_FILE}")
@@ -76,7 +76,7 @@ function _handle_symlinks {
     echo "${fname}"
 }
 
-function _color_marks {
+function _fzm_color_marks {
     if [[ "${FZF_MARKS_NO_COLORS}" == "1" ]]; then
         cat
     else
@@ -92,7 +92,7 @@ function _color_marks {
 function fzm {
     local delete_key=${FZF_MARKS_DELETE:-ctrl-d} paste_key=${FZF_MARKS_PASTE:-ctrl-v}
     local _fzm_keymap_description="ctrl-y:jump, ctrl-t:toggle, $delete_key:delete, $paste_key:paste"
-    local lines=$(_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} \
+    local lines=$(_fzm_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} \
         --ansi \
         --expect='"$delete_key,$paste_key"' \
         --multi \
@@ -121,11 +121,11 @@ function jump {
         jumpline=$2
     else
         local _fzm_keymap_description="ctrl-y:jump"
-        jumpline=$(_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} --ansi --bind=ctrl-y:accept --query='"$*"' --select-1 --tac)
+        jumpline=$(_fzm_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} --ansi --bind=ctrl-y:accept --query='"$*"' --select-1 --tac)
     fi
     if [[ -n ${jumpline} ]]; then
         jumpdir=$(echo "${jumpline}" | sed 's/.*: \(.*\)$/\1/' | sed "s#^~#${HOME}#")
-        bookmarks=$(_handle_symlinks)
+        bookmarks=$(_fzm_handle_symlinks)
         cd "${jumpdir}" || return
         if ! [[ "${FZF_MARKS_KEEP_ORDER}" == 1 ]]; then
             perl -n -i -e "print unless /^\\Q${jumpline//\//\\/}\\E\$/" "${bookmarks}"
@@ -140,7 +140,7 @@ function pmark {
         selected=$2
     else
         local _fzm_keymap_description="ctrl-y:paste"
-        selected=$(_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} --ansi --bind=ctrl-y:accept --query='"$*"' --select-1 --tac)
+        selected=$(_fzm_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} --ansi --bind=ctrl-y:accept --query='"$*"' --select-1 --tac)
     fi
     if [[ $selected ]]; then
         selected=$(sed 's/.*: \(.*\)$/\1/;s#^~#${HOME}#' <<< $selected)
@@ -155,9 +155,9 @@ function dmark {
         marks_to_delete=$2
     else
         local _fzm_keymap_description="ctrl-y:delete, ctrl-t:toggle"
-        marks_to_delete=$(_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} -m --ansi --bind=ctrl-y:accept,ctrl-t:toggle --query='"$*"' --tac)
+        marks_to_delete=$(_fzm_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} -m --ansi --bind=ctrl-y:accept,ctrl-t:toggle --query='"$*"' --tac)
     fi
-    bookmarks=$(_handle_symlinks)
+    bookmarks=$(_fzm_handle_symlinks)
 
     if [[ -n ${marks_to_delete} ]]; then
         while IFS='' read -r line; do
@@ -167,26 +167,26 @@ function dmark {
         [[ $(wc -l <<< "${marks_to_delete}") == 1 ]] \
             && echo "** The following mark has been deleted **" \
             || echo "** The following marks have been deleted **"
-        echo "${marks_to_delete}" | _color_marks
+        echo "${marks_to_delete}" | _fzm_color_marks
     fi
-    setup_completion
+    _fzm_setup_completion
 }
 
 if ((BASH_VERSINFO[0] >= 4)); then
     # Widget for Bash 4.0+
 
     # bashbug https://lists.gnu.org/archive/html/bug-bash/2018-04/msg00040.html
-    function _fzm-widget-has_readline_point_bug {
+    function _fzm_widget_has_readline_point_bug {
       [[ BASH_VERSINFO[0] -lt 5 && ! $_ble_attached ]]
     }
-    function _fzm-widget-has_readline_mark {
+    function _fzm_widget_has_readline_mark {
       [[ BASH_VERSINFO[0] -ge 5 || $_ble_attached ]]
     }
-    function _fzm-widget-insert {
+    function _fzm_widget_insert {
         local insert=$1
 
         # Work around bashbug
-        if _fzm-widget-has_readline_point_bug; then
+        if _fzm_widget_has_readline_point_bug; then
             # Convert READLINE_POINT from bytes to characters
             local old_lc_all=$LC_ALL old_lc_ctype=$LC_CTYPE
             local LC_ALL= LC_CTYPE=C
@@ -196,14 +196,14 @@ if ((BASH_VERSINFO[0] >= 4)); then
         fi
 
         READLINE_LINE=${READLINE_LINE::READLINE_POINT}$insert${READLINE_LINE:READLINE_POINT}
-        if _fzm-widget-has_readline_mark && ((READLINE_MARK > READLINE_POINT)); then
+        if _fzm_widget_has_readline_mark && ((READLINE_MARK > READLINE_POINT)); then
             # Bash 5.0 has new variable READLINE_MARK
             ((READLINE_MARK += ${#insert}))
         fi
         ((READLINE_POINT += ${#insert}))
 
         # Work around bashbug
-        if _fzm-widget-has_readline_point_bug; then
+        if _fzm_widget_has_readline_point_bug; then
             # Convert READLINE_POINT from characters to bytes
             local head=${READLINE_LINE::READLINE_POINT}
             local LC_ALL= LC_CTYPE=C
@@ -211,33 +211,33 @@ if ((BASH_VERSINFO[0] >= 4)); then
             LC_ALL=$old_lc_all LC_CTYPE=$old_lc_ctype
         fi
     } 2>/dev/null # Suppress locale error messages
-    function _fzm-widget-stash_line {
+    function _fzm_widget_stash_line {
         _fzm_line=$READLINE_LINE
         _fzm_point=$READLINE_POINT
         READLINE_LINE=
         READLINE_POINT=0
-        if _fzm-widget-has_readline_mark; then
+        if _fzm_widget_has_readline_mark; then
             _fzm_mark=$READLINE_MARK
             READLINE_MARK=0
         fi
     }
-    function _fzm-widget-pop_line {
+    function _fzm_widget_pop_line {
         READLINE_LINE=$_fzm_line
         READLINE_POINT=$_fzm_point
-        if _fzm-widget-has_readline_mark; then
+        if _fzm_widget_has_readline_mark; then
              READLINE_MARK=$_fzm_mark
         fi
     }
     function _fzm-widget {
         local pwd=$PWD
-        local FZF_MARKS_PASTE_COMMAND=_fzm-widget-insert
+        local FZF_MARKS_PASTE_COMMAND=_fzm_widget_insert
         fzm
 
         if [[ $PWD != "$pwd" ]]; then
             # Force the prompt update
-            _fzm-widget-stash_line
+            _fzm_widget_stash_line
             bind "\"$_fzm_key2\": \"\C-m$_fzm_key3\""
-            bind -x "\"$_fzm_key3\": _fzm-widget-pop_line"
+            bind -x "\"$_fzm_key3\": _fzm_widget_pop_line"
         else
             bind "\"$_fzm_key2\": \"\""
         fi
@@ -245,7 +245,7 @@ if ((BASH_VERSINFO[0] >= 4)); then
 
 else
     # Widget for Bash 3.0-3.2
-    function _fzm-widget-untranslate_keyseq {
+    function _fzm_widget_untranslate_keyseq {
         local value=$1
         if [[ $value == *[\'\"$'\001'-$'\037']* ]]; then
             local a b
@@ -287,7 +287,7 @@ else
     }
     function _fzm-widget {
         local pwd=$PWD
-        local FZF_MARKS_PASTE_COMMAND=_fzm-widget-untranslate_keyseq _fzm_keyseq=
+        local FZF_MARKS_PASTE_COMMAND=_fzm_widget_untranslate_keyseq _fzm_keyseq=
         fzm
 
         if [[ $PWD != "$pwd" ]]; then
@@ -311,7 +311,7 @@ function ble/widget/fzm {
     [[ $PWD != "$pwd" ]] && ble/prompt/clear
 }
 
-function set-up-fzm-bindings {
+function _fzm_setup_bindings {
     local jump_key=${FZF_MARKS_JUMP:-'\C-g'}
     if ((_ble_version>=400)); then
         ble-bind -f keyseq:"$jump_key" 'fzm'
@@ -341,5 +341,5 @@ function set-up-fzm-bindings {
     fi
 }
 
-set-up-fzm-bindings
-setup_completion
+_fzm_setup_bindings
+_fzm_setup_completion
