@@ -52,7 +52,7 @@ function mark {
         echo "${mark_to_add}" >> "${FZF_MARKS_FILE}"
         echo "** The following mark has been added **"
     fi
-    echo "${mark_to_add}" | _fzm_color_marks
+    _fzm_color_marks <<< "${mark_to_add}"
 }
 
 function _fzm_handle_symlinks {
@@ -135,7 +135,7 @@ function jump {
         jumpline=$(_fzm_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} --ansi --bind=ctrl-y:accept --query='"$*"' --select-1 --tac)
     fi
     if [[ -n ${jumpline} ]]; then
-        jumpdir=$(echo "${jumpline}" | sed 's/.*: \(.*\)$/\1/' | sed "s#^~#${HOME}#")
+        jumpdir=$(sed 's/.*: \(.*\)$/\1/;'"s#^~#${HOME}#" <<< "$jumpline")
         bookmarks=$(_fzm_handle_symlinks)
         cd "${jumpdir}" || return
         if ! [[ "${FZF_MARKS_KEEP_ORDER}" == 1 ]]; then
@@ -155,7 +155,7 @@ function pmark {
         selected=$(_fzm_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} --ansi --bind=ctrl-y:accept --query='"$*"' --select-1 --tac)
     fi
     if [[ $selected ]]; then
-        selected=$(sed 's/.*: \(.*\)$/\1/;s#^~#${HOME}#' <<< $selected)
+        selected=$(sed 's/.*: \(.*\)$/\1/;'"s#^~#${HOME}#" <<< "$selected")
         local paste_command=${FZF_MARKS_PASTE_COMMAND:-"printf '%s\n'"}
         eval -- "$paste_command \"\$selected\""
     fi
@@ -179,7 +179,7 @@ function dmark {
         [[ $(wc -l <<< "${marks_to_delete}") == 1 ]] \
             && echo "** The following mark has been deleted **" \
             || echo "** The following marks have been deleted **"
-        echo "${marks_to_delete}" | _fzm_color_marks
+        _fzm_color_marks <<< "${marks_to_delete}"
     fi
     zle && zle reset-prompt
 }
