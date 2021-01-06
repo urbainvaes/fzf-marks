@@ -30,10 +30,10 @@ fi
 
 if [[ -z "${FZF_MARKS_COMMAND}" ]] ; then
 
-    FZF_VERSION=$(fzf --version | awk -F. '{ print $1 * 1e6 + $2 * 1e3 + $3 }')
-    MINIMUM_VERSION=16001
+    _fzm_FZF_VERSION=$(fzf --version | awk -F. '{ print $1 * 1e6 + $2 * 1e3 + $3 }')
+    _fzm_MINIMUM_VERSION=16001
 
-    if [[ $FZF_VERSION -gt $MINIMUM_VERSION ]]; then
+    if [[ $_fzm_FZF_VERSION -gt $_fzm_MINIMUM_VERSION ]]; then
         FZF_MARKS_COMMAND="fzf --height 40% --reverse --header=\"\$_fzm_keymap_description\""
     elif [[ ${FZF_TMUX:-1} -eq 1 ]]; then
         FZF_MARKS_COMMAND="fzf-tmux -d${FZF_TMUX_HEIGHT:-40%}"
@@ -52,10 +52,10 @@ function mark {
         echo "${mark_to_add}" >> "${FZF_MARKS_FILE}"
         echo "** The following mark has been added **"
     fi
-    echo "${mark_to_add}" | _color_marks
+    echo "${mark_to_add}" | _fzm_color_marks
 }
 
-function _handle_symlinks {
+function _fzm_handle_symlinks {
     local fname link
     if [ -L "${FZF_MARKS_FILE}" ]; then
         link=$(readlink "${FZF_MARKS_FILE}")
@@ -79,7 +79,7 @@ function redraw-prompt {
 }
 zle -N redraw-prompt
 
-function _color_marks {
+function _fzm_color_marks {
     if [[ "${FZF_MARKS_NO_COLORS}" == "1" ]]; then
         cat
     else
@@ -101,7 +101,7 @@ function _fzm_paste_command {
 function fzm {
     local delete_key=${FZF_MARKS_DELETE:-ctrl-d} paste_key=${FZF_MARKS_PASTE:-ctrl-v}
     local _fzm_keymap_description="ctrl-y:jump, ctrl-t:toggle, ${delete_key}:delete, ${paste_key}:paste"
-    local lines=$(_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} \
+    local lines=$(_fzm_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} \
         --ansi \
         --expect='"$delete_key,$paste_key"' \
         --multi \
@@ -132,11 +132,11 @@ function jump {
         jumpline=$2
     else
         local _fzm_keymap_description="ctrl-y:jump"
-        jumpline=$(_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} --ansi --bind=ctrl-y:accept --query='"$*"' --select-1 --tac)
+        jumpline=$(_fzm_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} --ansi --bind=ctrl-y:accept --query='"$*"' --select-1 --tac)
     fi
     if [[ -n ${jumpline} ]]; then
         jumpdir=$(echo "${jumpline}" | sed 's/.*: \(.*\)$/\1/' | sed "s#^~#${HOME}#")
-        bookmarks=$(_handle_symlinks)
+        bookmarks=$(_fzm_handle_symlinks)
         cd "${jumpdir}" || return
         if ! [[ "${FZF_MARKS_KEEP_ORDER}" == 1 ]]; then
             perl -n -i -e "print unless /^\\Q${jumpline//\//\\/}\\E\$/" "${bookmarks}"
@@ -152,7 +152,7 @@ function pmark {
         selected=$2
     else
         local _fzm_keymap_description="ctrl-y:paste"
-        selected=$(_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} --ansi --bind=ctrl-y:accept --query='"$*"' --select-1 --tac)
+        selected=$(_fzm_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} --ansi --bind=ctrl-y:accept --query='"$*"' --select-1 --tac)
     fi
     if [[ $selected ]]; then
         selected=$(sed 's/.*: \(.*\)$/\1/;s#^~#${HOME}#' <<< $selected)
@@ -167,9 +167,9 @@ function dmark {
         marks_to_delete=$2
     else
         local _fzm_keymap_description="ctrl-y:delete, ctrl-t:toggle"
-        marks_to_delete=$(_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} -m --ansi --bind=ctrl-y:accept,ctrl-t:toggle --query='"$*"' --tac)
+        marks_to_delete=$(_fzm_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} -m --ansi --bind=ctrl-y:accept,ctrl-t:toggle --query='"$*"' --tac)
     fi
-    bookmarks=$(_handle_symlinks)
+    bookmarks=$(_fzm_handle_symlinks)
 
     if [[ -n ${marks_to_delete} ]]; then
         while IFS='' read -r line; do
@@ -179,7 +179,7 @@ function dmark {
         [[ $(wc -l <<< "${marks_to_delete}") == 1 ]] \
             && echo "** The following mark has been deleted **" \
             || echo "** The following marks have been deleted **"
-        echo "${marks_to_delete}" | _color_marks
+        echo "${marks_to_delete}" | _fzm_color_marks
     fi
     zle && zle reset-prompt
 }
