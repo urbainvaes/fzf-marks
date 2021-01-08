@@ -22,15 +22,15 @@
 
 command -v fzf >/dev/null 2>&1 || return
 
-if [[ -z "${FZF_MARKS_FILE}" ]] ; then
-    FZF_MARKS_FILE="${HOME}/.fzf-marks"
+if [[ -z ${FZF_MARKS_FILE-} ]] ; then
+    FZF_MARKS_FILE=${HOME}/.fzf-marks
 fi
 
-if [[ ! -f "${FZF_MARKS_FILE}" ]]; then
+if [[ ! -f ${FZF_MARKS_FILE} ]]; then
     touch "${FZF_MARKS_FILE}"
 fi
 
-if [[ -z "${FZF_MARKS_COMMAND}" ]] ; then
+if [[ -z ${FZF_MARKS_COMMAND-} ]] ; then
 
     _fzm_FZF_VERSION=$(fzf --version | awk -F. '{ print $1 * 1e6 + $2 * 1e3 + $3 }')
     _fzm_MINIMUM_VERSION=16001
@@ -77,7 +77,7 @@ function _fzm_handle_symlinks {
 }
 
 function _fzm_color_marks {
-    if [[ "${FZF_MARKS_NO_COLORS}" == "1" ]]; then
+    if [[ "${FZF_MARKS_NO_COLORS-}" == "1" ]]; then
         cat
     else
         local esc c_lhs c_rhs c_colon
@@ -319,7 +319,7 @@ function ble/widget/fzm {
 
 function _fzm_setup_bindings {
     local jump_key=${FZF_MARKS_JUMP:-'\C-g'}
-    if ((_ble_version>=400)); then
+    if ((${_ble_version:-0} >= 400)); then
         ble-bind -f keyseq:"$jump_key" 'fzm'
     else
         # Intiialize special keys used for key bindings
@@ -342,7 +342,7 @@ function _fzm_setup_bindings {
         bind "\"$jump_key\":\"$_fzm_key1$_fzm_key2\""
     fi
 
-    if [ "${FZF_MARKS_DMARK}" ]; then
+    if [[ ${FZF_MARKS_DMARK-} ]]; then
         bind -x "\"${FZF_MARKS_DMARK}\": dmark"
     fi
 }

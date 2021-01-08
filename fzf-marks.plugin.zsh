@@ -20,7 +20,7 @@
 
 command -v fzf >/dev/null 2>&1 || return
 
-if [[ -z "${FZF_MARKS_FILE}" ]] ; then
+if [[ -z "${FZF_MARKS_FILE-}" ]] ; then
     FZF_MARKS_FILE="${HOME}/.fzf-marks"
 fi
 
@@ -28,7 +28,7 @@ if [[ ! -f "${FZF_MARKS_FILE}" ]]; then
     touch "${FZF_MARKS_FILE}"
 fi
 
-if [[ -z "${FZF_MARKS_COMMAND}" ]] ; then
+if [[ -z "${FZF_MARKS_COMMAND-}" ]] ; then
 
     _fzm_FZF_VERSION=$(fzf --version | awk -F. '{ print $1 * 1e6 + $2 * 1e3 + $3 }')
     _fzm_MINIMUM_VERSION=16001
@@ -80,7 +80,7 @@ function redraw-prompt {
 zle -N redraw-prompt
 
 function _fzm_color_marks {
-    if [[ "${FZF_MARKS_NO_COLORS}" == "1" ]]; then
+    if [[ "${FZF_MARKS_NO_COLORS-}" == "1" ]]; then
         cat
     else
         local esc c_lhs c_rhs c_colon
@@ -194,7 +194,7 @@ zle -N dmark
 zle -N fzm
 
 bindkey ${FZF_MARKS_JUMP:-'^g'} fzm
-if [ "${FZF_MARKS_DMARK}" ]; then
+if [ "${FZF_MARKS_DMARK-}" ]; then
     bindkey ${FZF_MARKS_DMARK} dmark
 fi
 
