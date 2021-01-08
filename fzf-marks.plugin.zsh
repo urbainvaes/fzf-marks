@@ -49,10 +49,10 @@ function mark {
     if grep -qxFe "${mark_to_add}" "${FZF_MARKS_FILE}"; then
         echo "** The following mark already exists **"
     else
-        echo "${mark_to_add}" >> "${FZF_MARKS_FILE}"
+        printf '%s\n' "${mark_to_add}" >> "${FZF_MARKS_FILE}"
         echo "** The following mark has been added **"
     fi
-    echo "${mark_to_add}" | _fzm_color_marks
+    _fzm_color_marks <<< "${mark_to_add}"
 }
 
 function _fzm_handle_symlinks {
@@ -66,7 +66,7 @@ function _fzm_handle_symlinks {
     else
         fname=${FZF_MARKS_FILE}
     fi
-    echo "${fname}"
+    printf '%s\n' "${fname}"
 }
 
 # Ensure precmds are run after cd
@@ -137,12 +137,12 @@ function jump {
             --query='"$*"' --select-1 --tac)
     fi
     if [[ -n ${jumpline} ]]; then
-        jumpdir=$(echo "${jumpline}" | sed 's/.*: \(.*\)$/\1/' | sed "s#^~#${HOME}#")
+        jumpdir=$(sed 's/.*: \(.*\)$/\1/;'"s#^~#${HOME}#" <<< "$jumpline")
         bookmarks=$(_fzm_handle_symlinks)
         cd "${jumpdir}" || return
         if ! [[ "${FZF_MARKS_KEEP_ORDER}" == 1 ]]; then
             perl -n -i -e "print unless /^\\Q${jumpline//\//\\/}\\E\$/" "${bookmarks}"
-            echo "${jumpline}" >> "${FZF_MARKS_FILE}"
+            printf '%s\n' "${jumpline}" >> "${FZF_MARKS_FILE}"
         fi
     fi
     zle && zle redraw-prompt
@@ -159,7 +159,7 @@ function pmark {
             --query='"$*"' --select-1 --tac)
     fi
     if [[ $selected ]]; then
-        selected=$(sed 's/.*: \(.*\)$/\1/;s#^~#${HOME}#' <<< $selected)
+        selected=$(sed 's/.*: \(.*\)$/\1/;'"s#^~#${HOME}#" <<< "$selected")
         local paste_command=${FZF_MARKS_PASTE_COMMAND:-"printf '%s\n'"}
         eval -- "$paste_command \"\$selected\""
     fi
@@ -185,7 +185,7 @@ function dmark {
         [[ $(wc -l <<< "${marks_to_delete}") == 1 ]] \
             && echo "** The following mark has been deleted **" \
             || echo "** The following marks have been deleted **"
-        echo "${marks_to_delete}" | _fzm_color_marks
+        _fzm_color_marks <<< "${marks_to_delete}"
     fi
     zle && zle reset-prompt
 }
