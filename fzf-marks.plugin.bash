@@ -99,6 +99,7 @@ function fzm {
         --header='"ctrl-y:jump, ctrl-t:toggle, $delete_key:delete, $paste_key:paste"' \
         --query='"$*"' \
         --select-1 \
+        --no-sort \
         --tac)
     if [[ -z "$lines" ]]; then
         return 1
@@ -126,6 +127,7 @@ function jump {
             --header='"ctrl-y:jump"' \
             --query='"$*"' \
             --select-1 \
+            --no-sort \
             --tac)
     fi
     if [[ -n ${jumpline} ]]; then
