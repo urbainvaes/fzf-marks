@@ -99,6 +99,7 @@ function fzm {
         --header='"ctrl-y:jump, ctrl-t:toggle, $delete_key:delete, $paste_key:paste"' \
         --query='"$*"' \
         --select-1 \
+        --no-sort \
         --tac)
     if [[ -z "$lines" ]]; then
         return 1
@@ -128,7 +129,7 @@ function jump {
           jumpline=$(_fzm_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} \
               --ansi \
               --bind=ctrl-y:accept --header='"ctrl-y:jump"' \
-              --query='"$*"' --select-1 --tac)
+              --query='"$*"' --select-1 --no-sort --tac)
     fi
     if [[ -n ${jumpline} ]]; then
         jumpdir=$(sed 's/.*: \(.*\)$/\1/;'"s#^~#${HOME}#" <<< $jumpline)
