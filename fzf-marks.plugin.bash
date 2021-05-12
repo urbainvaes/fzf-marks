@@ -89,15 +89,34 @@ function _fzm_color_marks {
     fi
 }
 
+function _fzm_initial_filter {
+  local query=$1
+  local do_filter=false
+  : ${FZF_MARKS_INITIAL_FILTER:=1}
+  [[ $FZF_MARKS_INITIAL_FILTER == 1    ]] && do_filter=true
+  [[ $FZF_MARKS_INITIAL_FILTER == true ]] && do_filter=true
+  if $do_filter && [[ $query ]]; then
+    fzf --no-sort -n1 -f "$query"
+  else
+    cat
+  fi
+}
+
 function fzm {
     local delete_key=${FZF_MARKS_DELETE:-ctrl-d} paste_key=${FZF_MARKS_PASTE:-ctrl-v}
-    local cmd=(${FZF_MARKS_COMMAND} --ansi --expect="$delete_key,$paste_key" --multi --bind=ctrl-y:accept,ctrl-t:toggle --header="ctrl-y:jump, ctrl-t:toggle, $delete_key:delete, $paste_key:paste" --query="$*" --select-1 --no-sort --tac)
-    #FIXME: really want multi-level filtering. first level filters mark names only, second level filters mark dirs only.
-    # e.g. with fzf in filter mode, this prints only entries whose mark names match the initial query:
-    # cat .fzf-marks | fzf --no-sort -f "$*" -n1
-    # ideally we could feed back so that updating the first query string changes the pre-filter
-    [[ $* ]] && cmd+=(-n1)
-    local lines=$(_fzm_color_marks < "${FZF_MARKS_FILE}" | "${cmd[@]}")
+    local cmd=(${FZF_MARKS_COMMAND}
+      --ansi
+      --expect="$delete_key,$paste_key"
+      --multi
+      --bind=ctrl-y:accept,ctrl-t:toggle
+      --header="ctrl-y:jump, ctrl-t:toggle, $delete_key:delete, $paste_key:paste"
+      --select-1
+      --no-sort
+      --tac
+    )
+    #TODO: add an action to redo the initial filter with a different -f query string
+    #      eventually, use the first word of the current query to perform initial filtering automatically upon update
+    local lines=$(_fzm_initial_filter "$*" < "${FZF_MARKS_FILE}" | _fzm_color_marks | "${cmd[@]}")
     if [[ -z "$lines" ]]; then
         return 1
     fi
@@ -122,10 +141,16 @@ function jump {
         (($#)) && jumpline=$(grep "^$* : .*\$" "$FZF_MARKS_FILE")
         [[ ${jumpline} =~ $'\n' ]] && jumpline=
         # if not, prompt using fzf
-        local cmd=(${FZF_MARKS_COMMAND} --ansi --bind=ctrl-y:accept --header="ctrl-y:jump" --query="$*" --select-1 --no-sort --tac)
-        [[ $* ]] && cmd+=(-n1)
+        local cmd=(${FZF_MARKS_COMMAND}
+          --ansi
+          --bind=ctrl-y:accept
+          --header="ctrl-y:jump"
+          --select-1
+          --no-sort
+          --tac
+        )
         [[ $jumpline ]] || \
-          jumpline=$(_fzm_color_marks < "${FZF_MARKS_FILE}" | "${cmd[@]}")
+          jumpline=$(_fzm_initial_filter "$*" < "${FZF_MARKS_FILE}" | _fzm_color_marks | "${cmd[@]}")
     fi
     if [[ -n ${jumpline} ]]; then
         jumpdir=$(sed 's/.*: \(.*\)$/\1/;'"s#^~#${HOME}#" <<< $jumpline)
@@ -143,9 +168,14 @@ function pmark {
     if [[ $1 == "-->-->-->" ]]; then
         selected=$2
     else
-        local cmd=(${FZF_MARKS_COMMAND} --ansi --bind=ctrl-y:accept --header="ctrl-y:paste" --query="$*" --select-1 --tac)
-        [[ $* ]] && cmd+=(-n1)
-        selected=$(_fzm_color_marks < "${FZF_MARKS_FILE}" | "${cmd[@]}")
+      local cmd=(${FZF_MARKS_COMMAND}
+        --ansi
+        --bind=ctrl-y:accept
+        --header="ctrl-y:paste"
+        --select-1
+        --tac
+      )
+      selected=$(_fzm_initial_filter "$*" < "${FZF_MARKS_FILE}" | _fzm_color_marks | "${cmd[@]}")
     fi
     if [[ $selected ]]; then
         selected=$(sed 's/.*: \(.*\)$/\1/;'"s#^~#${HOME}#" <<< $selected)
@@ -159,9 +189,14 @@ function dmark {
     if [[ $1 == "-->-->-->" ]]; then
         marks_to_delete=$2
     else
-        local cmd=(${FZF_MARKS_COMMAND} -m --ansi --bind=ctrl-y:accept,ctrl-t:toggle --header="ctrl-y:delete, ctrl-t:toggle" --query="$*" --tac)
-        [[ $* ]] && cmd+=(-n1)
-        marks_to_delete=$(_fzm_color_marks < "${FZF_MARKS_FILE}" | "${cmd[@]}")
+      local cmd=(${FZF_MARKS_COMMAND}
+        -m
+        --ansi
+        --bind=ctrl-y:accept,ctrl-t:toggle
+        --header="ctrl-y:delete, ctrl-t:toggle"
+        --tac
+      )
+      marks_to_delete=$(_fzm_initial_filter "$*" < "${FZF_MARKS_FILE}" | _fzm_color_marks | "${cmd[@]}")
     fi
     bookmarks=$(_fzm_handle_symlinks)
 
