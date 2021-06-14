@@ -22,12 +22,25 @@
 
 command -v fzf >/dev/null 2>&1 || return
 
+PROGRAM_NAME="${PROGRAM_NAME:-fzf-marks}"
+
+_fzm_config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/$PROGRAM_NAME" #currently unused, but in the future can be used to load (and store?) an .env file from to more easily switch between multiple configuration
+_fzm_data_dir="${XDG_DATA_HOME:-$HOME/.local/share}/$PROGRAM_NAME"
+_fzm_legacy_marks_file="${HOME}/.fzf-marks"
+
 if [[ -z ${FZF_MARKS_FILE-} ]] ; then
-    FZF_MARKS_FILE=${HOME}/.fzf-marks
+    FZF_MARKS_FILE=${_fzm_data_dir}/default_bookmarks.fzf-marks
 fi
 
 if [[ ! -f ${FZF_MARKS_FILE} ]]; then
+  # Fallback support for the previous default location of the bookmarks file.
+  if [[ -f ${_fzm_legacy_marks_file} ]]; then
+    echo "Your FZF_MARKS_FILE is still in its legacy location of '${_fzm_legacy_marks_file}'; you might want to consider moving it to '${FZF_MARKS_FILE}' so it follows the XDG standard, or explicitly set FZF_MARKS_FILE='${_fzm_legacy_marks_file}'." >&2
+    FZF_MARKS_FILE=${_fzm_legacy_marks_file}
+  else
+    [[ ! -d ${_fzm_data_dir} ]] && (umask 077; mkdir "${_fzm_data_dir}")
     touch "${FZF_MARKS_FILE}"
+  fi
 fi
 
 if [[ -z ${FZF_MARKS_COMMAND-} ]] ; then
