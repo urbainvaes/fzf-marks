@@ -78,14 +78,14 @@ function _fzm_handle_symlinks {
 
 function _fzm_color_marks {
     if [[ "${FZF_MARKS_NO_COLORS-}" == "1" ]]; then
-        cat
+        grep "^[^#]" | cat
     else
         local esc c_lhs c_rhs c_colon
         esc=$(printf '\033')
         c_lhs=${FZF_MARKS_COLOR_LHS:-39}
         c_rhs=${FZF_MARKS_COLOR_RHS:-36}
         c_colon=${FZF_MARKS_COLOR_COLON:-33}
-        sed "s/^\\(.*\\) : \\(.*\\)$/${esc}[${c_lhs}m\\1${esc}[0m ${esc}[${c_colon}m:${esc}[0m ${esc}[${c_rhs}m\\2${esc}[0m/"
+        grep "^[^#]" | sed "s/^\\(.*\\) : \\(.*\\)$/${esc}[${c_lhs}m\\1${esc}[0m ${esc}[${c_colon}m:${esc}[0m ${esc}[${c_rhs}m\\2${esc}[0m/"
     fi
 }
 
