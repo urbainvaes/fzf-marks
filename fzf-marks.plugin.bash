@@ -23,11 +23,11 @@
 command -v fzf >/dev/null 2>&1 || return
 
 if [[ -z ${FZF_MARKS_FILE-} ]] ; then
-    FZF_MARKS_FILE=${HOME}/.fzf-marks
+    FZF_MARKS_FILE=$HOME/.fzf-marks
 fi
 
-if [[ ! -f ${FZF_MARKS_FILE} ]]; then
-    touch "${FZF_MARKS_FILE}"
+if [[ ! -f $FZF_MARKS_FILE ]]; then
+    touch "$FZF_MARKS_FILE"
 fi
 
 if [[ -z ${FZF_MARKS_COMMAND-} ]] ; then
@@ -122,8 +122,11 @@ function jump {
     else
         jumpline=$(_fzm_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} \
             --ansi \
-            --bind=ctrl-y:accept --header='"ctrl-y:jump"' \
-            --query='"$*"' --select-1 --tac)
+            --bind=ctrl-y:accept \
+            --header='"ctrl-y:jump"' \
+            --query='"$*"' \
+            --select-1 \
+            --tac)
     fi
     if [[ -n ${jumpline} ]]; then
         jumpdir=$(sed 's/.*: \(.*\)$/\1/;'"s#^~#${HOME}#" <<< $jumpline)

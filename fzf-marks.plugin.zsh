@@ -20,15 +20,15 @@
 
 command -v fzf >/dev/null 2>&1 || return
 
-if [[ -z "${FZF_MARKS_FILE-}" ]] ; then
-    FZF_MARKS_FILE="${HOME}/.fzf-marks"
+if [[ -z ${FZF_MARKS_FILE-} ]] ; then
+    FZF_MARKS_FILE=$HOME/.fzf-marks
 fi
 
-if [[ ! -f "${FZF_MARKS_FILE}" ]]; then
-    touch "${FZF_MARKS_FILE}"
+if [[ ! -f $FZF_MARKS_FILE ]]; then
+    touch "$FZF_MARKS_FILE"
 fi
 
-if [[ -z "${FZF_MARKS_COMMAND-}" ]] ; then
+if [[ -z ${FZF_MARKS_COMMAND-} ]] ; then
 
     _fzm_FZF_VERSION=$(fzf --version | awk -F. '{ print $1 * 1e6 + $2 * 1e3 + $3 }')
     _fzm_MINIMUM_VERSION=16001
@@ -52,7 +52,7 @@ function mark {
         printf '%s\n' "${mark_to_add}" >> "${FZF_MARKS_FILE}"
         echo "** The following mark has been added **"
     fi
-    _fzm_color_marks <<< "${mark_to_add}"
+    _fzm_color_marks <<< $mark_to_add
 }
 
 function _fzm_handle_symlinks {
@@ -105,7 +105,7 @@ function fzm {
         --expect='"$delete_key,$paste_key"' \
         --multi \
         --bind=ctrl-y:accept,ctrl-t:toggle \
-        --header='"ctrl-y:jump, ctrl-t:toggle, ${delete_key}:delete, ${paste_key}:paste"' \
+        --header='"ctrl-y:jump, ctrl-t:toggle, $delete_key:delete, $paste_key:paste"' \
         --query='"$*"' \
         --select-1 \
         --tac)
@@ -133,11 +133,14 @@ function jump {
     else
         jumpline=$(_fzm_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} \
             --ansi \
-            --bind=ctrl-y:accept --header='"ctrl-y:jump"' \
-            --query='"$*"' --select-1 --tac)
+            --bind=ctrl-y:accept \
+            --header='"ctrl-y:jump"' \
+            --query='"$*"' \
+            --select-1 \
+            --tac)
     fi
     if [[ -n ${jumpline} ]]; then
-        jumpdir=$(sed 's/.*: \(.*\)$/\1/;'"s#^~#${HOME}#" <<< "$jumpline")
+        jumpdir=$(sed 's/.*: \(.*\)$/\1/;'"s#^~#${HOME}#" <<< $jumpline)
         bookmarks=$(_fzm_handle_symlinks)
         cd "${jumpdir}" || return
         if [[ ! "${FZF_MARKS_KEEP_ORDER}" == 1 && -w ${FZF_MARKS_FILE} ]]; then
@@ -185,7 +188,7 @@ function dmark {
         [[ $(wc -l <<< "${marks_to_delete}") == 1 ]] \
             && echo "** The following mark has been deleted **" \
             || echo "** The following marks have been deleted **"
-        _fzm_color_marks <<< "${marks_to_delete}"
+        _fzm_color_marks <<< $marks_to_delete
     fi
     zle && zle reset-prompt
 }
