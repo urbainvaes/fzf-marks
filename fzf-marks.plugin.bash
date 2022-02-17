@@ -95,7 +95,7 @@ function fzm {
         --ansi \
         --expect='"$delete_key,$paste_key"' \
         --multi \
-        --bind=ctrl-y:accept,ctrl-t:toggle \
+        --bind=ctrl-y:accept,ctrl-t:toggle+down \
         --header='"ctrl-y:jump, ctrl-t:toggle, $delete_key:delete, $paste_key:paste"' \
         --query='"$*"' \
         --select-1 \
@@ -163,7 +163,7 @@ function dmark {
     else
         marks_to_delete=$(_fzm_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} \
             -m --ansi \
-            --bind=ctrl-y:accept,ctrl-t:toggle --header='"ctrl-y:delete, ctrl-t:toggle"' \
+            --bind=ctrl-y:accept,ctrl-t:toggle+down --header='"ctrl-y:delete, ctrl-t:toggle"' \
             --query='"$*"' --tac)
     fi
     bookmarks=$(_fzm_handle_symlinks)

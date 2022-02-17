@@ -94,7 +94,7 @@ function fzm
                --ansi \
                --expect="$marks_del" \
                --multi \
-               --bind=ctrl-y:accept,ctrl-t:toggle \
+               --bind=ctrl-y:accept,ctrl-t:toggle+down \
                --query=$argv \
                --select-1 \
                --tac)
@@ -136,7 +136,7 @@ function dmark
         set marks_to_delete (_color_marks < $FZF_MARKS_FILE | $FZF_MARKS_COMMAND \
                 -m \
                 --ansi \
-                --bind=ctrl-y:accept,ctrl-t:toggle \
+                --bind=ctrl-y:accept,ctrl-t:toggle+down \
                 --query="$argv" \
                 --tac)
     end
