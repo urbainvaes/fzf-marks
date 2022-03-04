@@ -89,17 +89,32 @@ function _fzm_color_marks {
     fi
 }
 
+function _fzm_initial_filter {
+  local query=$1
+  local do_filter=false
+  : ${FZF_MARKS_INITIAL_FILTER:=1}
+  [[ $FZF_MARKS_INITIAL_FILTER == 1    ]] && do_filter=true
+  [[ $FZF_MARKS_INITIAL_FILTER == true ]] && do_filter=true
+  if $do_filter && [[ $query ]]; then
+    fzf --no-sort -n1 -f "$query"
+  else
+    cat
+  fi
+}
+
 function fzm {
     local delete_key=${FZF_MARKS_DELETE:-ctrl-d} paste_key=${FZF_MARKS_PASTE:-ctrl-v}
-    local lines=$(_fzm_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} \
+    local cmd=(${FZF_MARKS_COMMAND}
         --ansi \
         --expect='"$delete_key,$paste_key"' \
         --multi \
         --bind=ctrl-y:accept,ctrl-t:toggle+down \
         --header='"ctrl-y:jump, ctrl-t:toggle, $delete_key:delete, $paste_key:paste"' \
-        --query='"$*"' \
         --select-1 \
         --tac)
+    #TODO: add an action to redo the initial filter with a different -f query string
+    #      eventually, use the first word of the current query to perform initial filtering automatically upon update
+    local lines=$(_fzm_initial_filter "$*" < "${FZF_MARKS_FILE}" | _fzm_color_marks | "${cmd[@]}")
     if [[ -z "$lines" ]]; then
         return 1
     fi
@@ -120,13 +135,13 @@ function jump {
     if [[ $1 == "-->-->-->" ]]; then
         jumpline=$2
     else
-        jumpline=$(_fzm_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} \
+        local cmd=(${FZF_MARKS_COMMAND}
             --ansi \
             --bind=ctrl-y:accept \
             --header='"ctrl-y:jump"' \
-            --query='"$*"' \
             --select-1 \
             --tac)
+        jumpline=$(_fzm_initial_filter "$*" < "${FZF_MARKS_FILE}" | _fzm_color_marks | "${cmd[@]}")
     fi
     if [[ -n ${jumpline} ]]; then
         jumpdir=$(sed 's/.*: \(.*\)$/\1/;'"s#^~#${HOME}#" <<< $jumpline)
@@ -144,10 +159,11 @@ function pmark {
     if [[ $1 == "-->-->-->" ]]; then
         selected=$2
     else
-        selected=$(_fzm_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} \
+      local cmd=(${FZF_MARKS_COMMAND}
             --ansi \
             --bind=ctrl-y:accept --header='"ctrl-y:paste"' \
-            --query='"$*"' --select-1 --tac)
+            --select-1 --tac)
+      selected=$(_fzm_initial_filter "$*" < "${FZF_MARKS_FILE}" | _fzm_color_marks | "${cmd[@]}")
     fi
     if [[ $selected ]]; then
         selected=$(sed 's/.*: \(.*\)$/\1/;'"s#^~#${HOME}#" <<< $selected)
@@ -161,10 +177,11 @@ function dmark {
     if [[ $1 == "-->-->-->" ]]; then
         marks_to_delete=$2
     else
-        marks_to_delete=$(_fzm_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} \
+      local cmd=(${FZF_MARKS_COMMAND}
             -m --ansi \
             --bind=ctrl-y:accept,ctrl-t:toggle+down --header='"ctrl-y:delete, ctrl-t:toggle"' \
-            --query='"$*"' --tac)
+            --tac)
+      marks_to_delete=$(_fzm_initial_filter "$*" < "${FZF_MARKS_FILE}" | _fzm_color_marks | "${cmd[@]}")
     fi
     bookmarks=$(_fzm_handle_symlinks)
 
