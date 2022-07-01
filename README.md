@@ -7,12 +7,6 @@ It depends on Junegunn Choi's fuzzy-finder [fzf](https://github.com/junegunn/fzf
 
 # Installation
 
-### Fig
-
-You can use [Fig](https://fig.io) to install `fzf-marks` on zsh, fish, or bash with just one click.
-
-<a href="https://fig.io/plugins/other/powerlevel10k" target="_blank"><img src="https://fig.io/badges/install-with-fig.svg" /></a>
-
 ### Zsh
 
 If you use *zsh*, I recommend installing with a plugin manager.
@@ -34,6 +28,12 @@ If you use *bash*,
 or if you use *zsh* without a plugin manager,
 source the file `fzf-marks.plugin.bash` or `fzf-marks.plugin.zsh` from your shell startup file
 to enable the plugin.
+
+### Fig
+
+You can use [Fig](https://fig.io) to install `fzf-marks` on zsh, fish, or bash with just one click.
+
+<a href="https://fig.io/plugins/other/powerlevel10k" target="_blank"><img src="https://fig.io/badges/install-with-fig.svg" /></a>
 
 
 **Bash installation example**:
