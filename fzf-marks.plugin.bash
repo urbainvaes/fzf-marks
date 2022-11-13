@@ -50,11 +50,7 @@ function _fzm_setup_completion {
 
 function mark {
     local mark_to_add
-    if [ -z "$1" ]; then
-      mark_to_add="$(basename "$(pwd)") : $(pwd)"
-    else
-      mark_to_add="$* : $(pwd)"
-    fi
+    mark_to_add="${*:-$(basename "$(pwd)")} : $(pwd)"
 
     if grep -qxFe "${mark_to_add}" "${FZF_MARKS_FILE}"; then
         echo "** The following mark already exists **"
