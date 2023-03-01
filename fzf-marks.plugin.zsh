@@ -44,7 +44,7 @@ fi
 
 function mark {
     local mark_to_add
-    mark_to_add="$* : $(pwd)"
+    mark_to_add="${*:-$(basename "$(pwd)")} : $(pwd)"
 
     if grep -qxFe "${mark_to_add}" "${FZF_MARKS_FILE}"; then
         echo "** The following mark already exists **"
