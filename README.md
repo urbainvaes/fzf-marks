@@ -29,13 +29,6 @@ or if you use *zsh* without a plugin manager,
 source the file `fzf-marks.plugin.bash` or `fzf-marks.plugin.zsh` from your shell startup file
 to enable the plugin.
 
-### Fig
-
-You can use [Fig](https://fig.io) to install `fzf-marks` on zsh, fish, or bash with just one click.
-
-<a href="https://fig.io/plugins/other/powerlevel10k" target="_blank"><img src="https://fig.io/badges/install-with-fig.svg" /></a>
-
-
 **Bash installation example**:
 ```bash
 # Clone the git repository in the current directory
