@@ -120,6 +120,11 @@ function jump {
     if [[ $1 == "-->-->-->" ]]; then
         jumpline=$2
     else
+        # accept if provided string matches a single bookmark exactly
+        (($#)) && jumpline=$(grep "^$* : .*\$" "$FZF_MARKS_FILE")
+        [[ ${jumpline} =~ $'\n' ]] && jumpline=
+        # if not, prompt using fzf
+        [[ $jumpline ]] || \
         jumpline=$(_fzm_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} \
             --ansi \
             --bind=ctrl-y:accept \
