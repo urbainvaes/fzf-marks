@@ -207,7 +207,7 @@ command -v compdef >/dev/null 2>&1 || return
 # https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org#user-content-actions
 function _fzm {
     _arguments -C \
-        "1: :(($(sed "s/\\(.*\\) : \\(.*\\)/'\1'\\\\:'\2'/" < ~/.fzf-marks)))" \
+        "1: :(($(sed "s/\\(.*\\) : \\(.*\\)/'\1'\\\\:'\2'/" < "$FZF_MARKS_FILE")))" \
 }
 
 compdef _fzm fzm
