@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-type -P fzf >/dev/null || return
+type -p fzf >/dev/null || return
 
 if [[ -z ${FZF_MARKS_FILE-} ]] ; then
     FZF_MARKS_FILE=$HOME/.fzf-marks
