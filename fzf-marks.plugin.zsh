@@ -33,10 +33,10 @@ if [[ -z ${FZF_MARKS_COMMAND-} ]] ; then
     _fzm_FZF_VERSION=$(fzf --version | awk -F. '{ print $1 * 1e6 + $2 * 1e3 + $3 }')
     _fzm_MINIMUM_VERSION=16001
 
-    if [[ $_fzm_FZF_VERSION -gt $_fzm_MINIMUM_VERSION ]]; then
-        FZF_MARKS_COMMAND="fzf --height 40% --reverse"
-    elif [[ ${FZF_TMUX:-1} -eq 1 ]]; then
+    if (( $+commands[fzf-tmux] )); then
         FZF_MARKS_COMMAND="fzf-tmux -d${FZF_TMUX_HEIGHT:-40%}"
+    elif [[ $_fzm_FZF_VERSION -gt $_fzm_MINIMUM_VERSION ]]; then
+        FZF_MARKS_COMMAND="fzf --height 40% --reverse"
     else
         FZF_MARKS_COMMAND="fzf"
     fi
