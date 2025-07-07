@@ -89,15 +89,17 @@ end
 function fzm
     set -l marks_del $FZF_MARKS_DELETE
     set -lq marks_del[1]; or set marks_del[1] "ctrl-d"
-
-    set lines (_color_marks < $FZF_MARKS_FILE | eval $FZF_MARKS_COMMAND \
-               --ansi \
+    set -l args   --ansi \
                --expect="$marks_del" \
                --multi \
                --bind=ctrl-y:accept,ctrl-t:toggle+down \
                --query=$argv \
                --select-1 \
-               --tac)
+               --tac
+
+    test "$FZF_MARKS_JUMP_EXACT_MATCH" = "1" && set -a args --bind=one:accept --query='"^"'
+
+    set lines (_color_marks < $FZF_MARKS_FILE | eval $FZF_MARKS_COMMAND $args )
     if test -z "$lines"
         commandline -f repaint
         return 1

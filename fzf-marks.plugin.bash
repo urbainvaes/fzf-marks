@@ -91,8 +91,7 @@ function _fzm_color_marks {
 
 function fzm {
     local delete_key=${FZF_MARKS_DELETE:-ctrl-d} paste_key=${FZF_MARKS_PASTE:-ctrl-v}
-    local lines=$(_fzm_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} \
-        --ansi \
+    args=(--ansi \
         --expect='"$delete_key,$paste_key"' \
         --multi \
         --bind=ctrl-y:accept,ctrl-t:toggle+down \
@@ -100,6 +99,10 @@ function fzm {
         --query='"$*"' \
         --select-1 \
         --tac)
+
+    [[ $FZF_MARKS_JUMP_EXACT_MATCH == 1 ]] && args+=(--bind=one:accept --query='"^"')
+
+    local lines=$(_fzm_color_marks < "${FZF_MARKS_FILE}" | eval ${FZF_MARKS_COMMAND} ${args[@]} )
     if [[ -z "$lines" ]]; then
         return 1
     fi

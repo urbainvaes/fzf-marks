@@ -78,6 +78,7 @@ By default, the plugin binds the key `ctrl-g` to `fzm`.
 | `FZF_MARKS_COLOR_COLON` | 33 (yellow)                     | ANSI color code of separator         |
 | `FZF_MARKS_NO_COLORS`   | 0                               | Set this to 1 to disable colors      |
 | `FZF_MARKS_KEEP_ORDER`  | 0                               | Set this to 1 to keep order of marks |
+| `FZF_MARKS_JUMP_EXACT_MATCH`  | 0                               | Set to 1 to autojump to first single match
 
 See e.g. [here](http://pueblo.sourceforge.net/doc/manual/ansi_color_codes.html) for a description of ANSI color codes.
 
