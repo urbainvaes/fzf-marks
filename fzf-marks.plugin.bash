@@ -133,7 +133,8 @@ function jump {
         bookmarks=$(_fzm_handle_symlinks)
         cd "${jumpdir}" || return
         if [[ ! "${FZF_MARKS_KEEP_ORDER}" == 1 && -w ${FZF_MARKS_FILE} ]]; then
-            perl -n -i -e "print unless /^\\Q${jumpline//\//\\/}\\E\$/" "${bookmarks}"
+            command grep -vxF "$jumpline" "$bookmarks" > "$bookmarks.tmp"
+            command mv "$bookmarks.tmp" "$bookmarks"
             printf '%s\n' "${jumpline}" >> "${FZF_MARKS_FILE}"
         fi
     fi
@@ -169,9 +170,8 @@ function dmark {
     bookmarks=$(_fzm_handle_symlinks)
 
     if [[ -n ${marks_to_delete} ]]; then
-        while IFS='' read -r line; do
-            perl -n -i -e "print unless /^\\Q${line//\//\\/}\\E\$/" "${bookmarks}"
-        done <<< "$marks_to_delete"
+        command grep -vxF "$marks_to_delete" "$bookmarks" > "$bookmarks.tmp"
+        command mv "$bookmarks.tmp" "$bookmarks"
 
         [[ $(wc -l <<< "${marks_to_delete}") == 1 ]] \
             && echo "** The following mark has been deleted **" \
