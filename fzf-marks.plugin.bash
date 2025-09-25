@@ -342,7 +342,9 @@ function _fzm_setup_bindings {
         fi
 
         bind -x "\"$_fzm_key1\": _fzm-widget"
-        bind "\"$jump_key\":\"$_fzm_key1$_fzm_key2\""
+        bind -m emacs "\"$jump_key\":\"$_fzm_key1$_fzm_key2\""
+        bind -m vi-command "\"$jump_key\":\"$_fzm_key1$_fzm_key2\""
+        bind -m vi-insert "\"$jump_key\":\"$_fzm_key1$_fzm_key2\""
     fi
 
     if [[ ${FZF_MARKS_DMARK-} ]]; then

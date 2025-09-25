@@ -196,7 +196,9 @@ function dmark {
 zle -N dmark
 zle -N fzm
 
-bindkey ${FZF_MARKS_JUMP:-'^g'} fzm
+bindkey -M emacs ${FZF_MARKS_JUMP:-'^g'} fzm
+bindkey -M vicmd ${FZF_MARKS_JUMP:-'^g'} fzm
+bindkey -M viins ${FZF_MARKS_JUMP:-'^g'} fzm
 if [ "${FZF_MARKS_DMARK-}" ]; then
     bindkey ${FZF_MARKS_DMARK} dmark
 fi
